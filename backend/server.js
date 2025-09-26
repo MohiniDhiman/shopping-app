@@ -52,7 +52,6 @@ app.get("/api/products", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-const path = require("path");
 app.use(express.static(path.join(__dirname, "client/build")));
 
 app.get("*", (req, res) => {
