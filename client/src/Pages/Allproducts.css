@@ -1,0 +1,92 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.all-products {
+  padding: 20px;
+  text-align: center;
+}
+
+.all-products h2 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #333;
+}
+
+/* Product Grid Layout */
+.all-product-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Four columns */
+  gap: 20px; /* Space between products */
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+/* Product Card */
+.all-product-item {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.all-product-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+.all-product-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+}
+
+.all-product-item h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 10px 0;
+}
+
+.all-product-list p {
+  font-size: 1rem;
+  color: #555;
+}
+.price-info {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.price-info .price {
+  color: #e63946;
+}
+
+.price-info .old-price {
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .product-card {
+    grid-template-columns: repeat(3, 1fr); /* Three columns for smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .product-card {
+    grid-template-columns: repeat(2, 1fr); /* Two columns for tablets */
+  }
+}
+
+@media (max-width: 576px) {
+  .product-card {
+    grid-template-columns: 1fr; /* One column for mobile screens */
+  }
+}

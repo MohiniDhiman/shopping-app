@@ -1,0 +1,80 @@
+/* Full-page container, center card */
+.order-success-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* full viewport height */
+  width: 100vw;  /* full viewport width */
+  background: #f9fafb; /* light background */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* Card styling */
+.success-card {
+  background: #ffffff; /* plain white card */
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* subtle shadow */
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  z-index: 10; /* above confetti */
+}
+
+/* Success image */
+.success-card img {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1rem;
+}
+
+/* Heading */
+.success-card h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+/* Order details */
+.success-card p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+/* Simple green button */
+.success-card button {
+  padding: 0.6rem 1.5rem;
+  background-color: #4caf50; /* simple green */
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.success-card button:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .success-card {
+    padding: 1.5rem 2rem;
+  }
+
+  .success-card h1 {
+    font-size: 1.3rem;
+  }
+
+  .success-card p {
+    font-size: 0.95rem;
+  }
+}

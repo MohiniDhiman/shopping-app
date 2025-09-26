@@ -1,0 +1,233 @@
+/* Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  font-family: 'Poppins', sans-serif;
+  background-color: #fafafa;
+  color: #111;
+}
+
+/* Header */
+.zyra-header {
+  width: 100%;
+  background-color: #fff;
+  border-bottom: 1px solid #eaeaea;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Top announcement */
+.top-banner {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 0.85rem;
+  color: #444;
+  background-color: #f9f9f9;
+}
+
+/* Main Header Bar */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 40px;
+  position: relative;
+}
+
+/* Brand Center */
+.brand-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.brand-center h1 {
+  font-size: 1.5rem;
+  letter-spacing: 8px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.brand-subtext {
+  font-size: 0.8rem;
+  letter-spacing: 6px;
+  color: #666;
+}
+
+/* Right Side Icons */
+.nav-right {
+  display: flex;
+  gap: 20px;
+  list-style: none;
+  align-items: center;
+}
+
+.nav-right li {
+  font-size: 0.9rem;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s ease;
+}
+
+.nav-right li:hover {
+  color: #e91e63;
+}
+
+/* Responsive Header */
+@media (max-width: 768px) {
+  .main-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-right {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    display: flex;
+    gap: 10px;
+    margin-top: 38px;
+  }
+
+  .brand-center h1 {
+     font-size: 1.2rem;
+  }
+
+  .brand-subtext {
+     font-size: 0.7rem;
+  }
+}
+.hero-banner-container {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+/* Cards Section */
+.cards-section {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 30px 20px;
+  flex-wrap: wrap;
+  background-color: #fafafa;
+}
+
+.category-card {
+  width: 300px;
+  height: 380px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  background: white;
+  transform: scale(1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  /* Animation */
+  animation: fadeInUp 0.6s ease both;
+}
+
+/* On Hover */
+.category-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+}
+
+.category-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.95);
+  transition: filter 0.3s;
+}
+
+.category-card:hover img {
+  filter: brightness(0.75);
+}
+
+/* Card Text Overlay */
+.card-text {
+  position: absolute;
+  bottom: 0;
+  background: rgba(57, 56, 56, 0.55);
+  width: 100%;
+  padding: 20px;
+  text-align: center;
+  backdrop-filter: blur(4px);
+}
+
+.card-text h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: 0.5px;
+  color:#fff;
+}
+.category-heading {
+  font-size: 2.5rem;
+  text-align: center;
+  margin: 5px 0;
+  font-weight: bold;
+  background: linear-gradient(90deg, #61043c, #6c0153, #fcc202);
+  background-size: 200% auto;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: shine 3s linear infinite;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+@keyframes shine {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+
+/* Responsive Cards */
+@media (max-width: 768px) {
+  .cards-section {
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+
+  .category-card {
+    width: 90%;
+    height: 300px;
+  }
+
+  .site-title {
+    font-size: 1.4rem;
+  }
+}
+
+/* Entry Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

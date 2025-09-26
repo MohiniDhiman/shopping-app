@@ -1,0 +1,68 @@
+.banner-section {
+  width: 96vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.homepage-banner-wrapper {
+  width: 96vw;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.homepage-banner-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.homepage-banner-item {
+  flex: 0 0 100vw;
+  scroll-snap-align: start;
+  height: 400px;
+  position: relative;
+}
+
+.homepage-banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  cursor: pointer;
+}
+
+.dot-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding-bottom: 2px;
+  z-index: 2;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #bbb;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: #333;
+  transform: scale(1.4);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+@media screen and (max-width: 768px) {
+  .homepage-banner-item {
+    height: 240px;
+  }
+}

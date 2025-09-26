@@ -1,0 +1,180 @@
+/* ===== General Page Styles ===== */
+.manage-offers-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fc, #eef2f7);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Title */
+.manage-offers-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* ===== Form Styling ===== */
+.offer-form {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  padding: 20px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+  animation: slideUp 0.6s ease-in-out;
+}
+
+.offer-form input,
+.offer-form select,
+.offer-form textarea {
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.offer-form input:focus,
+.offer-form select:focus,
+.offer-form textarea:focus {
+  border-color: #4a90e2;
+  outline: none;
+  box-shadow: 0 0 6px rgba(74, 144, 226, 0.4);
+}
+
+/* Submit Button */
+.offer-form button {
+  grid-column: 1 / -1;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #4a90e2, #357abd);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.25s ease, background 0.3s ease;
+}
+
+.offer-form button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #357abd, #2d6cb2);
+}
+
+/* ===== Offers List ===== */
+.offers-list {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.offer-card {
+  background: #fff;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: fadeInUp 0.7s ease;
+}
+
+.offer-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.offer-card h3 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.offer-card p {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 4px 0;
+}
+
+.offer-card small {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+/* Action Buttons */
+.offer-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.offer-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.offer-actions .edit-btn {
+  background: #4cafef;
+  color: #fff;
+}
+
+.offer-actions .edit-btn:hover {
+  background: #3a94d6;
+  transform: scale(1.05);
+}
+
+.offer-actions .delete-btn {
+  background: #f76c6c;
+  color: #fff;
+}
+
+.offer-actions .delete-btn:hover {
+  background: #e85757;
+  transform: scale(1.05);
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+  .manage-offers-container {
+    padding: 15px;
+  }
+
+  .offer-form {
+    grid-template-columns: 1fr;
+  }
+
+  .offers-list {
+    grid-template-columns: 1fr;
+  }
+}
