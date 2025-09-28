@@ -58,11 +58,11 @@ const Cart = () => {
             {cartWithOffers.map((item) => (
               <div className="cart-item" key={`${item.cart_id}-${item.size || "NA"}`}>
                 {/* Image */}
-                <img
-                  src={item.image || "https://via.placeholder.com/300"}
-                  alt={item.name}
-                  className="cart-item-img"
-                />
+              <img
+  src={item.image ? `${apiUrl.replace("/api", "")}/uploads/${encodeURIComponent(item.image)}` : "https://via.placeholder.com/150"}
+  alt={item.name}
+/>
+
 
                 {/* Item Info */}
                 <div className="cart-item-info">

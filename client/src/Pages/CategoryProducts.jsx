@@ -53,9 +53,10 @@ const CategoryProducts = () => {
               style={{ cursor: "pointer" }}
             >
               <img
-                src={prod.image || "https://via.placeholder.com/300"}
-                alt={prod.name}
-              />
+  src={prod.image ? `${apiUrl.replace("/api", "")}/uploads/${encodeURIComponent(prod.image)}` : "https://via.placeholder.com/300"}
+  alt={prod.name}
+/>
+
               <h3>{prod.name}</h3>
               <div className="price-info">
                 <span className="price">₹{prod.price}</span>

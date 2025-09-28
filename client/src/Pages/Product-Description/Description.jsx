@@ -24,9 +24,9 @@ const Description = () => {
         const res = await axios.get(`${apiUrl}/products/${id}`);
         const currentProduct = res.data;
 
-        // Update image with full backend path
+        // ✅ Update main product image
         if (currentProduct.image) {
-          currentProduct.image = `${baseUrl}/uploads/${currentProduct.image}`;
+          currentProduct.image = `${baseUrl}/uploads/${encodeURIComponent(currentProduct.image)}`;
         }
 
         setProduct(currentProduct);
@@ -37,7 +37,7 @@ const Description = () => {
             .filter(p => p.category_id === currentProduct.category_id && p.id !== parseInt(id))
             .map(p => ({
               ...p,
-              image: p.image ? `${baseUrl}/uploads/${p.image}` : null
+              image: p.image ? `${baseUrl}/uploads/${encodeURIComponent(p.image)}` : null
             }));
           setRelatedProducts(filtered);
         }
@@ -54,9 +54,7 @@ const Description = () => {
   }, [id, apiUrl, baseUrl]);
 
   const handleAddToCart = () => {
-    if (product.sizes?.length > 0 && !selectedSize) {
-      return alert("Select a size");
-    }
+    if (product.sizes?.length > 0 && !selectedSize) return alert("Select a size");
 
     const productToAdd = {
       id: product.id,
@@ -72,9 +70,7 @@ const Description = () => {
     alert("Product added to cart!");
   };
 
-  const toggleOffer = (id) => {
-    setOpenOffers((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  const toggleOffer = (id) => setOpenOffers((prev) => ({ ...prev, [id]: !prev[id] }));
 
   if (loading) return <h2 className="not-found">Loading product...</h2>;
   if (!product) return <h2 className="not-found">Product Not Found</h2>;
