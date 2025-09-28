@@ -48,7 +48,11 @@ const CategoryProducts = () => {
               onClick={() => handleProductClick(prod.id)}
               style={{ cursor: "pointer" }}
             >
-              <img src={prod.image || "https://via.placeholder.com/300"} alt={prod.name} />
+             <img
+  src={prod.image ? `${apiUrl}/uploads/${encodeURIComponent(prod.image)}` : "https://via.placeholder.com/300"}
+  alt={prod.name}
+/>
+
               <h3>{prod.name}</h3>
               <div className="price-info">
                 <span className="price">₹{prod.price}</span>
