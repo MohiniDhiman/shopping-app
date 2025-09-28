@@ -2,25 +2,28 @@ import React, { useState } from "react";
 
 const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
   const [loading, setLoading] = useState(false);
+  const apiUrl = import.meta.env.VITE_API_URL; // use deployed backend
 
   const handlePayment = async () => {
     try {
       setLoading(true);
 
-      const userId = Number(localStorage.getItem("userId"));
-      if (!userId) {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user?.id) {
         alert("User not logged in!");
         setLoading(false);
         return;
       }
+
+      const userId = Number(user.id);
 
       // Prepare payment payload with cart_id
       const paymentPayload = {
         amount,
         userId,
         items: items.map((item) => ({
-          cart_id: item.cart_id,           // cart table id
-          product_id: item.product_id,     // product reference
+          cart_id: item.cart_id,
+          product_id: item.product_id,
           quantity: item.quantity,
           price: item.price,
           offer_applied: item.appliedOffer || null,
@@ -30,7 +33,7 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
       console.log("Payment payload:", paymentPayload);
 
       // Create Razorpay order
-      const res = await fetch("http://localhost:5000/api/payment/orders", {
+      const res = await fetch(`${apiUrl}/payment/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(paymentPayload),
@@ -42,7 +45,7 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
         setLoading(false);
         return;
       }
-      const apiUrl = import.meta.env.VITE_API_URL;
+
       // Razorpay options
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY || "rzp_test_XXXXXXXXXXXXXX",
@@ -53,7 +56,7 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
         order_id: data.id,
         handler: async function (response) {
           try {
-           const verifyRes = await fetch(`${apiUrl}/payment/verify`, {
+            const verifyRes = await fetch(`${apiUrl}/payment/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -77,8 +80,8 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
           }
         },
         prefill: {
-          name: localStorage.getItem("name") || "Customer",
-          email: localStorage.getItem("email") || "customer@example.com",
+          name: user.name || "Customer",
+          email: user.email || "customer@example.com",
         },
         theme: { color: "#3399cc" },
       };

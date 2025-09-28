@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import './Description.css';
@@ -12,18 +12,20 @@ const Description = () => {
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState("");
   const [offers, setOffers] = useState([]); 
-  const [openOffers, setOpenOffers] = useState({}); // ✅ track open state of gifts
-const { addToCart } = useCart();
+  const [openOffers, setOpenOffers] = useState({});
+  const { addToCart } = useCart();
+
+  const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
 
   useEffect(() => {
     const fetchProductAndRelated = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const res = await axios.get(`${apiUrl}/products/${id}`);
         const currentProduct = res.data;
         setProduct(currentProduct);
 
         if (currentProduct.category_id) {
-          const relatedRes = await axios.get(`http://localhost:5000/api/products`);
+          const relatedRes = await axios.get(`${apiUrl}/products`);
           const filtered = relatedRes.data.filter(
             p => p.category_id === currentProduct.category_id && p.id !== parseInt(id)
           );
@@ -39,7 +41,7 @@ const { addToCart } = useCart();
     };
 
     fetchProductAndRelated();
-  }, [id]);
+  }, [id, apiUrl]);
 
   const handleAddToCart = () => {
     if (product.sizes?.length > 0 && !selectedSize) {
@@ -53,18 +55,15 @@ const { addToCart } = useCart();
       image: product.image,
       size: selectedSize || "default",
       quantity: 1,
-      offers: product.offers || [], // ✅ include offers here
-  };
+      offers: product.offers || [],
+    };
 
     addToCart(productToAdd);
     alert("Product added to cart!");
   };
 
   const toggleOffer = (id) => {
-    setOpenOffers((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    setOpenOffers((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   if (loading) return <h2 className="not-found">Loading product...</h2>;
@@ -104,67 +103,65 @@ const { addToCart } = useCart();
             </div>
           )}
 
-          {/* ✅ Display Offers */}
           {offers.length > 0 && (
             <div className="product-offers">
-                <div className="offers-header">
-              <strong>Offers:</strong>
-              <ul>
-                {offers.map((offer) => {
-                  const offerText =
-                    offer.discount_type === "percentage"
-                      ? `${offer.discount_value}% off`
-                      : offer.discount_type === "flat"
-                      ? `₹${offer.discount_value} off`
-                      : offer.discount_type === "bogo"
-                      ? `Buy ${offer.buy_quantity} Get ${offer.get_quantity} Free`
-                      : offer.discount_type === "free_shipping"
-                      ? "Free Shipping"
-                      : "";
+              <div className="offers-header">
+                <strong>Offers:</strong>
+                <ul>
+                  {offers.map((offer) => {
+                    const offerText =
+                      offer.discount_type === "percentage"
+                        ? `${offer.discount_value}% off`
+                        : offer.discount_type === "flat"
+                        ? `₹${offer.discount_value} off`
+                        : offer.discount_type === "bogo"
+                        ? `Buy ${offer.buy_quantity} Get ${offer.get_quantity} Free`
+                        : offer.discount_type === "free_shipping"
+                        ? "Free Shipping"
+                        : "";
 
-                  return (
-                    <li
-                      key={offer.id}
-                      className={openOffers[offer.id] ? "open" : ""}
-                      onClick={() => toggleOffer(offer.id)}
-                    >
-                      {openOffers[offer.id] ? offerText : "🎁"} {/* show gift box until clicked */}
-                    </li>
-                  );
-                })}
-              </ul>
+                    return (
+                      <li
+                        key={offer.id}
+                        className={openOffers[offer.id] ? "open" : ""}
+                        onClick={() => toggleOffer(offer.id)}
+                      >
+                        {openOffers[offer.id] ? offerText : "🎁"}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             </div>
           )}
 
           <div className="action-buttons">
             <button className="btn add-cart" onClick={handleAddToCart}>Add to Cart</button>
-           <button
-  className="btn buy-now"
-  onClick={() =>
-    navigate("/buy-now-checkout", {
-      state: {
-        buyNowProduct: {
-          product_id: product.id,
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          image: product.image,
-          size: selectedSize || (product.sizes?.[0] || "default"),
-          quantity: 1,
-          offers: product.offers || [],
-        },
-      },
-    })
-  }
->
-  Buy Now
-</button>
-
+            <button
+              className="btn buy-now"
+              onClick={() =>
+                navigate("/buy-now-checkout", {
+                  state: {
+                    buyNowProduct: {
+                      product_id: product.id,
+                      id: product.id,
+                      name: product.name,
+                      price: product.price,
+                      image: product.image,
+                      size: selectedSize || (product.sizes?.[0] || "default"),
+                      quantity: 1,
+                      offers: product.offers || [],
+                    },
+                  },
+                })
+              }
+            >
+              Buy Now
+            </button>
           </div>
         </div>
       </div>
-      
+
       <div className="related-products">
         <h2>More in this Category</h2>
         <div className="related-product-list">
@@ -175,9 +172,7 @@ const { addToCart } = useCart();
                 <h3>{item.name}</h3>
                 <div className="price-info">
                   <span className="price">₹{item.price}</span>
-                  {item.oldPrice && (
-                    <span className="old-price">₹{item.oldPrice}</span>
-                  )}
+                  {item.oldPrice && <span className="old-price">₹{item.oldPrice}</span>}
                 </div>
               </div>
             </Link>

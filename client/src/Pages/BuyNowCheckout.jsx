@@ -12,15 +12,12 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
   const GST_PERCENT = 10;
   const PLATFORM_FEE = 5;
 
-  // ✅ Persist userId: use prop first, fallback to localStorage
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId = propUserId || storedUser?.id;
 
-  // ✅ Get product passed from Buy Now button
   const product = location.state?.buyNowProduct;
   if (!product) return <p>No product selected for Buy Now.</p>;
 
-  // ✅ Apply offers for single product
   const basePrice = Number(product.price) || 0;
   let totalPrice = basePrice * product.quantity;
   let appliedOffer = null;
@@ -50,13 +47,14 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
   const gst = (subtotal * GST_PERCENT) / 100;
   const finalAmount = subtotal + gst + PLATFORM_FEE;
 
-  // ✅ Handle order save after successful payment
+  const apiUrl = import.meta.env.VITE_API_URL; // ✅ use deployed backend
+
   const handlePaymentSuccess = async () => {
     try {
       if (!userId) return alert("User not logged in!");
 
       // Save address
-      const addrRes = await fetch("http://localhost:5000/api/addresses", {
+      const addrRes = await fetch(`${apiUrl}/addresses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, ...address }),
@@ -84,7 +82,7 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
         status: "paid",
       };
 
-      const orderRes = await fetch("http://localhost:5000/api/orders", {
+      const orderRes = await fetch(`${apiUrl}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderPayload),
@@ -104,7 +102,6 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
 
   return (
     <div className="checkout-container">
-      {/* Left Panel */}
       <div className="checkout-left">
         <h2>Buy Now Checkout</h2>
         <AddressForm userId={userId} setAddress={setAddress} />
@@ -122,7 +119,6 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
         />
       </div>
 
-      {/* Right Panel */}
       <div className="checkout-right">
         <h2>Order Summary</h2>
         <div className="summary-item" key={`${product.product_id}-${product.size}`}>

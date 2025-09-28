@@ -2,19 +2,32 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+// ========== Ensure Uploads Directory ==========
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 // ========== IMAGE UPLOAD SETUP ==========
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
+  destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 const upload = multer({ storage });
 
+// 🔹 Helper to build full image URL
+const getImageUrl = (filename) => {
+  if (!filename) return null;
+  const baseUrl = process.env.BASE_URL || "http://localhost:5000";
+  return `${baseUrl}/uploads/${filename}`;
+};
+
 // ========== UPLOAD IMAGE ==========
 router.post("/upload-image", upload.single("image"), (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No image uploaded" });
-  const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
-  res.status(200).json({ imageUrl });
+  const imageUrl = getImageUrl(req.file.filename);
+  res.status(200).json({ imageUrl, filename: req.file.filename });
 });
 
 // ========== ADD NEW PRODUCT ==========
@@ -24,7 +37,7 @@ router.post("/add-product", async (req, res) => {
     const {
       name,
       category_id,
-      image,
+      image, // filename
       price,
       old_price,
       description,
@@ -50,7 +63,6 @@ router.post("/add-product", async (req, res) => {
 
     const productId = result.rows[0].id;
 
-    // Save offers in product_offers
     if (offers && offers.length > 0) {
       for (let offerId of offers) {
         await client.query(
@@ -83,7 +95,6 @@ router.get("/products", async (req, res) => {
             ? prod.sizes.replace("{", "").replace("}", "").split(",")
             : prod.sizes || [];
 
-        // Fetch offers for each product
         const offersRes = await pool.query(
           `SELECT o.* FROM offers o
            JOIN product_offers po ON o.id = po.offer_id
@@ -95,6 +106,7 @@ router.get("/products", async (req, res) => {
           ...prod,
           sizes,
           offers: offersRes.rows,
+          image_url: getImageUrl(prod.image), // ✅ full URL for frontend
         };
       })
     );
@@ -130,6 +142,7 @@ router.get("/products/:id", async (req, res) => {
       [id]
     );
     product.offers = offersRes.rows;
+    product.image_url = getImageUrl(product.image); // ✅ add URL
 
     res.json(product);
   } catch (err) {
@@ -142,10 +155,9 @@ router.get("/products/:id", async (req, res) => {
 router.delete("/products/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    // Delete related offers first
     await pool.query(`DELETE FROM product_offers WHERE product_id = $1`, [id]);
-
     const result = await pool.query("DELETE FROM products WHERE id = $1", [id]);
+
     if (result.rowCount === 0)
       return res.status(404).json({ error: "Product not found" });
 
@@ -202,12 +214,10 @@ router.put("/products/:id", async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    // Delete old offers
     await client.query(`DELETE FROM product_offers WHERE product_id = $1`, [
       id,
     ]);
 
-    // Insert new offers
     if (offers && offers.length > 0) {
       for (let offerId of offers) {
         await client.query(

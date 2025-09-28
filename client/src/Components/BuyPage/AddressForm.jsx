@@ -13,17 +13,17 @@ const AddressForm = ({ setAddress }) => {
     phone: "",
   });
 
-  // ✅ Get userId from localStorage (persistent across refresh)
+  const apiUrl = import.meta.env.VITE_API_URL; // deployed backend
+
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId = storedUser?.id;
 
-  // ✅ Fetch addresses from backend
   useEffect(() => {
-    if (!userId) return; // don’t call API if userId is missing
+    if (!userId) return;
 
     const fetchAddresses = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/address/${userId}`);
+        const res = await fetch(`${apiUrl}/address/${userId}`);
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
         const data = await res.json();
         setAddresses(data || []);
@@ -41,11 +41,10 @@ const AddressForm = ({ setAddress }) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Save new address to backend
   const handleSaveAddress = async () => {
     if (!userId) return alert("User not logged in!");
     try {
-      const res = await fetch("http://localhost:5000/api/address", {
+      const res = await fetch(`${apiUrl}/address`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, user_id: userId }),
@@ -54,7 +53,7 @@ const AddressForm = ({ setAddress }) => {
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       const newAddress = await res.json();
 
-      setAddresses([...addresses, newAddress]); // update state
+      setAddresses([...addresses, newAddress]);
       setFormData({
         name: "",
         street: "",
@@ -70,18 +69,13 @@ const AddressForm = ({ setAddress }) => {
     }
   };
 
-  // ✅ Delete address
   const handleDeleteAddress = async (id) => {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/address/${id}`, {
-        method: "DELETE",
-      });
-
+      const res = await fetch(`${apiUrl}/address/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-
-      setAddresses(addresses.filter((addr) => addr.id !== id)); // update UI
+      setAddresses(addresses.filter((addr) => addr.id !== id));
     } catch (err) {
       console.error("Error deleting address:", err);
       alert("Failed to delete address. Please try again.");
@@ -89,14 +83,13 @@ const AddressForm = ({ setAddress }) => {
   };
 
   const handleUseAddress = (addr) => {
-    setAddress(addr); // send selected address to parent checkout
+    setAddress(addr);
   };
 
   return (
     <div className="address-form-container">
       <h3>Shipping Address</h3>
 
-      {/* Saved Addresses */}
       {addresses.length > 0 && !showForm && (
         <div className="saved-addresses">
           {addresses.map((addr, idx) => (
@@ -110,13 +103,10 @@ const AddressForm = ({ setAddress }) => {
               </div>
             </div>
           ))}
-          <button className="add-new-btn" onClick={() => setShowForm(true)}>
-            + Add Another Address
-          </button>
+          <button className="add-new-btn" onClick={() => setShowForm(true)}>+ Add Another Address</button>
         </div>
       )}
 
-      {/* Address Form (shows if no addresses OR add new clicked) */}
       {(showForm || addresses.length === 0) && (
         <div className="address-form">
           <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />

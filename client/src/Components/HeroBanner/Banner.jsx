@@ -8,12 +8,15 @@ const Banner = () => {
   const trackRef = useRef(null);
   const navigate = useNavigate();
 
+  // Use deployed backend URL from environment variable
+  const apiUrl = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
-    fetch("http://localhost:5000/api/banners")
+    fetch(`${apiUrl}/banners`)
       .then((res) => res.json())
       .then((data) => setBanners(data))
       .catch((err) => console.error("Failed to fetch banners:", err));
-  }, []);
+  }, [apiUrl]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -63,12 +66,13 @@ const Banner = () => {
         <div className="homepage-banner-wrapper" ref={trackRef}>
           {banners.map((banner, i) => (
             <div className="homepage-banner-item" key={i}>
-              <img
-                src={`http://localhost:5000/uploads/banner/${banner.image_filename}`}
-                alt={`banner-${i}`}
-                className="homepage-banner-image"
-                onClick={() => handleBannerClick(banner.link)}
-              />
+<img
+  src={`${apiUrl.replace("/api", "")}/uploads/banner/${banner.image_filename}`}
+  alt={`banner-${i}`}
+  className="homepage-banner-image"
+  onClick={() => handleBannerClick(banner.link)}
+/>
+
             </div>
           ))}
         </div>
@@ -87,4 +91,5 @@ const Banner = () => {
     </>
   );
 };
+
 export default Banner;

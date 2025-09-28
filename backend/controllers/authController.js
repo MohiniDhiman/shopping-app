@@ -3,10 +3,10 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const pool = require("../db");
 
-const JWT_SECRET = "your_jwt_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET; // store in .env for production
 
+// Signup (public)
 exports.signup = async (req, res) => {
-  console.log("Request body:", req.body);
   const { name, email, mobile, password } = req.body;
 
   if (!name || !email || !mobile || !password) {
@@ -23,7 +23,7 @@ exports.signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const role = "user"; // always default for public signup
+    const role = "user"; // default role for signup
 
     await pool.query(
       "INSERT INTO users (name, email, mobile, password, role) VALUES ($1, $2, $3, $4, $5)",
@@ -32,11 +32,12 @@ exports.signup = async (req, res) => {
 
     res.status(201).json({ message: "Signup successful" });
   } catch (error) {
-    console.error("Signup error details:", error); // full error log
+    console.error("Signup error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
+// Login (role-based)
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -45,16 +46,16 @@ exports.login = async (req, res) => {
       email,
     ]);
     const user = result.rows[0];
+
     if (!user) return res.status(400).json({ error: "User not found" });
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ error: "Invalid password" });
 
-    const token = jwt.sign(
-      { id: user.id, isAdmin: user.is_admin },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // Role-based token
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.json({
       token,
@@ -62,11 +63,12 @@ exports.login = async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
-        isAdmin: user.is_admin,
+        role: user.role, // 'admin' or 'user'
+        isAdmin: user.role === "admin",
       },
     });
   } catch (err) {
-    console.error(err);
+    console.error("Login error:", err);
     res.status(500).json({ error: "Login failed" });
   }
 };

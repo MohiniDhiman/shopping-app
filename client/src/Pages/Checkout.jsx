@@ -5,6 +5,9 @@ import PaymentOptions from "../Components/BuyPage/PaymentOptions";
 import { useCart } from "./context/CartContext";
 import { useNavigate } from "react-router-dom";
 
+// ✅ Import API URL from Vite environment
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const Checkout = ({ singleProduct, userId: propUserId }) => {
   const { cart, clearCart } = useCart();
   const productsToShow = singleProduct ? [singleProduct] : cart;
@@ -15,12 +18,9 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
   const GST_PERCENT = 10;
   const PLATFORM_FEE = 5;
 
-  // ✅ Persist userId: use prop first, fallback to localStorage
- const storedUser = JSON.parse(localStorage.getItem("user"));
-const userId = propUserId || storedUser?.id;
-
-  // Helper to safely convert to number and format
-  const safeNumber = (val) => (val ? Number(val).toFixed(2) : "0.00");
+  // Persist userId: prop first, fallback to localStorage
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId = propUserId || storedUser?.id;
 
   const itemsWithOffers = productsToShow.map((item) => {
     const basePrice = Number(item.price) || 0;
@@ -64,15 +64,15 @@ const userId = propUserId || storedUser?.id;
       totalPrice,
       priceWithOffer: totalPrice / item.quantity,
       appliedOffer,
-      allOffers: item.offers || [],    // ✅ fix undefined allOffers
-      cart_id: item.cart_id,           // ✅ cart table id
-      product_id: item.product_id,     // ✅ product id
+      allOffers: item.offers || [],
+      cart_id: item.cart_id,
+      product_id: item.product_id,
     };
   });
 
   const subtotal = itemsWithOffers.reduce((sum, item) => sum + item.totalPrice, 0);
-const gst = (subtotal * GST_PERCENT) / 100;
-const finalAmount = subtotal + gst + PLATFORM_FEE;
+  const gst = (subtotal * GST_PERCENT) / 100;
+  const finalAmount = subtotal + gst + PLATFORM_FEE;
 
   // Handle order save after successful payment
   const handlePaymentSuccess = async () => {
@@ -80,7 +80,7 @@ const finalAmount = subtotal + gst + PLATFORM_FEE;
       if (!userId) return alert("User not logged in!");
 
       // Save address
-      const addrRes = await fetch("http://localhost:5000/api/addresses", {
+      const addrRes = await fetch(`${apiUrl}/addresses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, ...address }),
@@ -94,8 +94,8 @@ const finalAmount = subtotal + gst + PLATFORM_FEE;
         user_id: userId,
         address_id: addressId,
         items: itemsWithOffers.map((item) => ({
-          cart_id: item.cart_id,           // ✅ cart table id
-          product_id: item.product_id,     // ✅ product id
+          cart_id: item.cart_id,
+          product_id: item.product_id,
           quantity: item.quantity,
           price: Number(item.priceWithOffer) || 0,
           offer_applied: item.appliedOffer || null,
@@ -107,7 +107,7 @@ const finalAmount = subtotal + gst + PLATFORM_FEE;
         status: "paid",
       };
 
-      const orderRes = await fetch("http://localhost:5000/api/orders", {
+      const orderRes = await fetch(`${apiUrl}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderPayload),
@@ -136,8 +136,8 @@ const finalAmount = subtotal + gst + PLATFORM_FEE;
           amount={finalAmount}
           onPaymentSuccess={handlePaymentSuccess}
           items={itemsWithOffers.map((item) => ({
-            cart_id: item.cart_id,        // ✅ correct cart id
-            product_id: item.product_id,  // ✅ correct product id
+            cart_id: item.cart_id,
+            product_id: item.product_id,
             quantity: item.quantity,
             price: Number(item.priceWithOffer) || 0,
             offer_applied: item.appliedOffer || null,
@@ -152,9 +152,9 @@ const finalAmount = subtotal + gst + PLATFORM_FEE;
           <p>No products in cart</p>
         ) : (
           <>
-           {itemsWithOffers.map((item) => (
-  <div className="summary-item" key={`${item.cart_id}-${item.size}`}>
-                <img src={item.image} alt={item.name} />
+            {itemsWithOffers.map((item) => (
+              <div className="summary-item" key={`${item.cart_id}-${item.size}`}>
+                <img src={item.image || "https://via.placeholder.com/150"} alt={item.name} />
                 <div>
                   <h4>{item.name}</h4>
                   <p>Unit Price: ₹{Number(item.price).toFixed(2)}</p>

@@ -1,4 +1,3 @@
-// context/CartContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
@@ -6,24 +5,26 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
-  const userId = localStorage.getItem("userId");
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId = storedUser?.id;
 
-  // Fetch cart on mount
+  const apiUrl = import.meta.env.VITE_API_URL; // ✅ deployed backend
+
   useEffect(() => {
     if (!userId) return;
+
     const fetchCart = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/cart/${userId}`);
-        // Map backend response to include cart_id and image
+        const res = await axios.get(`${apiUrl}/cart/${userId}`);
         const mappedCart = res.data.map((item) => ({
-          cart_id: item.id,              // cart table id
-          product_id: item.product_id,   // product id
+          cart_id: item.id,
+          product_id: item.product_id,
           quantity: item.quantity,
           size: item.size || "M",
           appliedOffer: item.offer || null,
           price: item.price,
           offers: item.offers || [],
-          image: item.image || "",       // <--- include image
+          image: item.image || "",
           name: item.name || "",
         }));
         setCart(mappedCart);
@@ -31,12 +32,13 @@ export const CartProvider = ({ children }) => {
         console.error("Failed to fetch cart", err);
       }
     };
-    fetchCart();
-  }, [userId]);
 
-  // Compute best offer from array of offers
+    fetchCart();
+  }, [userId, apiUrl]);
+
   const getBestOffer = (item) => {
     if (!item.offers || item.offers.length === 0) return null;
+
     const best = item.offers.reduce((prev, curr) => {
       let prevPrice = Number(item.price);
       let currPrice = Number(item.price);
@@ -57,6 +59,7 @@ export const CartProvider = ({ children }) => {
 
       return currPrice < prevPrice ? curr : prev;
     });
+
     return best;
   };
 
@@ -65,7 +68,7 @@ export const CartProvider = ({ children }) => {
     const size = item.size || "M";
 
     try {
-      const res = await axios.post("http://localhost:5000/api/cart", {
+      const res = await axios.post(`${apiUrl}/cart`, {
         user_id: userId,
         product_id: item.product_id || item.id,
         quantity: item.quantity || 1,
@@ -98,15 +101,17 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const increaseQuantity = async (cartId) => {
+  const updateCartItem = async (cartId, quantity) => {
     const item = cart.find((i) => i.cart_id === cartId);
     if (!item) return;
 
+    if (quantity <= 0) return removeFromCart(cartId);
+
     try {
-      const res = await axios.post("http://localhost:5000/api/cart", {
+      const res = await axios.post(`${apiUrl}/cart`, {
         user_id: userId,
         product_id: item.product_id,
-        quantity: item.quantity + 1,
+        quantity,
         offer: item.appliedOffer || null,
         size: item.size,
       });
@@ -130,44 +135,24 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  const decreaseQuantity = async (cartId) => {
+  const increaseQuantity = (cartId) => {
     const item = cart.find((i) => i.cart_id === cartId);
     if (!item) return;
-    if (item.quantity <= 1) return removeFromCart(cartId);
+    updateCartItem(cartId, item.quantity + 1);
+  };
 
-    try {
-      const res = await axios.post("http://localhost:5000/api/cart", {
-        user_id: userId,
-        product_id: item.product_id,
-        quantity: item.quantity - 1,
-        offer: item.appliedOffer || null,
-        size: item.size,
-      });
-
-      const updatedItem = {
-        cart_id: res.data.id,
-        product_id: res.data.product_id,
-        quantity: res.data.quantity,
-        size: res.data.size,
-        appliedOffer: res.data.offer || null,
-        price: res.data.price,
-        offers: res.data.offers || [],
-        image: res.data.image || "",
-        name: res.data.name || "",
-      };
-      updatedItem.appliedOffer = getBestOffer(updatedItem);
-
-      setCart((prev) => prev.map((i) => (i.cart_id === cartId ? updatedItem : i)));
-    } catch (err) {
-      console.error(err);
-    }
+  const decreaseQuantity = (cartId) => {
+    const item = cart.find((i) => i.cart_id === cartId);
+    if (!item) return;
+    updateCartItem(cartId, item.quantity - 1);
   };
 
   const removeFromCart = async (cartId) => {
     const item = cart.find((i) => i.cart_id === cartId);
     if (!item) return;
+
     try {
-      await axios.delete(`http://localhost:5000/api/cart/${userId}/${item.product_id}/${item.size}`);
+      await axios.delete(`${apiUrl}/cart/${userId}/${item.product_id}/${item.size}`);
       setCart((prev) => prev.filter((i) => i.cart_id !== cartId));
     } catch (err) {
       console.error(err);
@@ -176,7 +161,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/cart/clear/${userId}`);
+      await axios.delete(`${apiUrl}/cart/clear/${userId}`);
       setCart([]);
     } catch (err) {
       console.error(err);

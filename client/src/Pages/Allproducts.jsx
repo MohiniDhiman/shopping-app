@@ -7,10 +7,12 @@ const AllProducts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${apiUrl}/products`);
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
         setProducts(data);
@@ -23,34 +25,33 @@ const AllProducts = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [apiUrl]);
 
   if (loading) return <p>Loading products...</p>;
   if (error) return <p>{error}</p>;
 
   return (
-<div className="all-products">
-  <h2>All Products</h2>
+    <div className="all-products">
+      <h2>All Products</h2>
 
-  <div className="all-product-list">
-    {products.map((prod) => (
-      <Link to={`/product/${prod.id}`} className="all-product-item" key={prod.id}>
-        <img
-          src={prod.image || "https://via.placeholder.com/300"}
-          alt={prod.name}
-        />
-        <h3>{prod.name}</h3>
-  <div className="price-info">
-    <span className="price">₹{prod.price}</span>
-    {prod.old_price > 0 && (
-      <span className="old-price">₹{prod.old_price}</span>
-    )}
-  </div>
-      </Link>
-    ))}
-  </div>
-</div>
-
+      <div className="all-product-list">
+        {products.map((prod) => (
+          <Link to={`/product/${prod.id}`} className="all-product-item" key={prod.id}>
+            <img
+              src={prod.image || "https://via.placeholder.com/300"}
+              alt={prod.name}
+            />
+            <h3>{prod.name}</h3>
+            <div className="price-info">
+              <span className="price">₹{prod.price}</span>
+              {prod.old_price > 0 && (
+                <span className="old-price">₹{prod.old_price}</span>
+              )}
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 };
 

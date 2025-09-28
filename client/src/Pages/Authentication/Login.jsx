@@ -8,35 +8,41 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await axios.post("http://localhost:5000/api/auth/login", form);
+    e.preventDefault();
 
-    // Save token and role in localStorage
-    localStorage.setItem("token", res.data.token);
+    try {
+      // Use Vite environment variable for backend URL
+      const apiUrl = import.meta.env.VITE_API_URL;
 
-    // Save full user object for easier access later
-    const user = {
-      id: res.data.user.id,
-      name: res.data.user.name,
-      email: res.data.user.email,
-      role: res.data.user.role
-    };
-    localStorage.setItem("user", JSON.stringify(user));
+      const res = await axios.post(`${apiUrl}/auth/login`, form);
 
-    alert("Login successful");
+      // Save token and role in localStorage
+      localStorage.setItem("token", res.data.token);
 
-    // Redirect based on role
-    if (res.data.user.role === "admin") {
-      navigate("/admin/dashboard");
-    } else {
-      navigate("/home");
+      // Save full user object for easier access
+      const user = {
+        id: res.data.user.id,
+        name: res.data.user.name,
+        email: res.data.user.email,
+        role: res.data.user.role,
+        isAdmin: res.data.user.role === "admin",
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+
+      alert("Login successful");
+
+      // Redirect based on role
+      if (user.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/home");
+      }
+
+    } catch (err) {
+      alert(err.response?.data?.error || "Something went wrong");
+      console.error("Login error:", err);
     }
-
-  } catch (err) {
-    alert(err.response?.data?.error || "Something went wrong");
-  }
-};
+  };
 
   return (
     <div className="auth-container">
