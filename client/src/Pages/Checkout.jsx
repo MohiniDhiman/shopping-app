@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 // ✅ Import API URL from Vite environment
 const apiUrl = import.meta.env.VITE_API_URL;
+const baseUrl = apiUrl.replace("/api", ""); // full image path
 
 const Checkout = ({ singleProduct, userId: propUserId }) => {
   const { cart, clearCart } = useCart();
@@ -18,7 +19,6 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
   const GST_PERCENT = 10;
   const PLATFORM_FEE = 5;
 
-  // Persist userId: prop first, fallback to localStorage
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId = propUserId || storedUser?.id;
 
@@ -26,6 +26,9 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
     const basePrice = Number(item.price) || 0;
     let totalPrice = basePrice * item.quantity;
     let appliedOffer = item.appliedOffer || null;
+
+    // Full image path
+    const imageUrl = item.image ? `${baseUrl}/uploads/${encodeURIComponent(item.image)}` : null;
 
     const offerDetails =
       item.offers?.map((o) => {
@@ -67,6 +70,7 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
       allOffers: item.offers || [],
       cart_id: item.cart_id,
       product_id: item.product_id,
+      image: imageUrl,
     };
   });
 
@@ -74,12 +78,10 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
   const gst = (subtotal * GST_PERCENT) / 100;
   const finalAmount = subtotal + gst + PLATFORM_FEE;
 
-  // Handle order save after successful payment
   const handlePaymentSuccess = async () => {
     try {
       if (!userId) return alert("User not logged in!");
 
-      // Save address
       const addrRes = await fetch(`${apiUrl}/addresses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +91,6 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
       if (!addrRes.ok) return alert(savedAddress.error || "Failed to save address");
       const addressId = savedAddress.id;
 
-      // Save order
       const orderPayload = {
         user_id: userId,
         address_id: addressId,
@@ -128,7 +129,6 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
 
   return (
     <div className="checkout-container">
-      {/* Left Panel */}
       <div className="checkout-left">
         <h2>Checkout</h2>
         <AddressForm userId={userId} setAddress={setAddress} />
@@ -145,7 +145,6 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
         />
       </div>
 
-      {/* Right Panel */}
       <div className="checkout-right">
         <h2>Order Summary</h2>
         {itemsWithOffers.length === 0 ? (
@@ -163,7 +162,7 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
 
                   {item.appliedOffer && (
                     <p className="offer-text">
-                      Best Offer Applied:{" none"}
+                      Best Offer Applied:{" "}
                       {item.appliedOffer.discount_type === "percentage"
                         ? `${item.appliedOffer.discount_value}% off`
                         : item.appliedOffer.discount_type === "flat"

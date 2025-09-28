@@ -16,19 +16,29 @@ const Description = () => {
   const { addToCart } = useCart();
 
   const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
+  const baseUrl = apiUrl.replace("/api", ""); // for image paths
 
   useEffect(() => {
     const fetchProductAndRelated = async () => {
       try {
         const res = await axios.get(`${apiUrl}/products/${id}`);
         const currentProduct = res.data;
+
+        // Update image with full backend path
+        if (currentProduct.image) {
+          currentProduct.image = `${baseUrl}/uploads/${currentProduct.image}`;
+        }
+
         setProduct(currentProduct);
 
         if (currentProduct.category_id) {
           const relatedRes = await axios.get(`${apiUrl}/products`);
-          const filtered = relatedRes.data.filter(
-            p => p.category_id === currentProduct.category_id && p.id !== parseInt(id)
-          );
+          const filtered = relatedRes.data
+            .filter(p => p.category_id === currentProduct.category_id && p.id !== parseInt(id))
+            .map(p => ({
+              ...p,
+              image: p.image ? `${baseUrl}/uploads/${p.image}` : null
+            }));
           setRelatedProducts(filtered);
         }
 
@@ -41,7 +51,7 @@ const Description = () => {
     };
 
     fetchProductAndRelated();
-  }, [id, apiUrl]);
+  }, [id, apiUrl, baseUrl]);
 
   const handleAddToCart = () => {
     if (product.sizes?.length > 0 && !selectedSize) {
@@ -78,12 +88,10 @@ const Description = () => {
 
         <div className="right-panel slide-in-right">
           <h2>{product.name}</h2>
-
           <p className="price">
             {product.old_price && <span className="old-price">₹{product.old_price}</span>}
             <span className="new-price">₹{product.price}</span>
           </p>
-
           <p className="desc">{product.description}</p>
 
           {product.sizes?.length > 0 && (

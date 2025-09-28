@@ -8,6 +8,7 @@ const AllProducts = () => {
   const [error, setError] = useState("");
 
   const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
+  const baseUrl = apiUrl.replace("/api", "");   // full image path
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -15,7 +16,14 @@ const AllProducts = () => {
         const res = await fetch(`${apiUrl}/products`);
         if (!res.ok) throw new Error("Failed to fetch products");
         const data = await res.json();
-        setProducts(data);
+
+        // Prepend baseUrl for image paths
+        const updatedProducts = data.map((prod) => ({
+          ...prod,
+          image: prod.image ? `${baseUrl}/uploads/${encodeURIComponent(prod.image)}` : null
+        }));
+
+        setProducts(updatedProducts);
       } catch (err) {
         console.error(err);
         setError("Failed to load products.");
@@ -25,7 +33,7 @@ const AllProducts = () => {
     };
 
     fetchProducts();
-  }, [apiUrl]);
+  }, [apiUrl, baseUrl]);
 
   if (loading) return <p>Loading products...</p>;
   if (error) return <p>{error}</p>;

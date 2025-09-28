@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "./context/CartContext"; 
 import "./Cart.css";
@@ -6,10 +7,16 @@ const Cart = () => {
   const { cart, increaseQuantity, decreaseQuantity, removeFromCart, clearCart } = useCart();
   const navigate = useNavigate();
 
+  const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
+  const baseUrl = apiUrl.replace("/api", "");   // full image path
+
   // ✅ Calculate cart items with best offer applied without mutating state
   const cartWithOffers = cart.map((item) => {
     let basePrice = Number(item.price);
     let appliedOffer = null;
+
+    // Prepend baseUrl to image
+    const imageUrl = item.image ? `${baseUrl}/uploads/${encodeURIComponent(item.image)}` : null;
 
     if (item.offers?.length > 0) {
       const discountedPrices = item.offers.map((o) => {
@@ -34,7 +41,7 @@ const Cart = () => {
       appliedOffer = best.offer;
     }
 
-    return { ...item, appliedOffer, basePrice };
+    return { ...item, appliedOffer, basePrice, image: imageUrl };
   });
 
   const totalAmount = cartWithOffers.reduce((sum, item) => sum + item.basePrice * item.quantity, 0);
@@ -52,7 +59,7 @@ const Cart = () => {
               <div className="cart-item" key={`${item.cart_id}-${item.size || "NA"}`}>
                 {/* Image */}
                 <img
-                  src={item.image}
+                  src={item.image || "https://via.placeholder.com/300"}
                   alt={item.name}
                   className="cart-item-img"
                 />
@@ -107,14 +114,14 @@ const Cart = () => {
 
                   {/* Actions */}
                   <div className="cart-actions">
-                   <button
-                          className="buy-btn"
-                             onClick={() =>
-                           navigate("/buy-now-checkout", { state: { buyNowProduct: item } })
-                              }
-                           >
-                         Buy Now
-                      </button>
+                    <button
+                      className="buy-btn"
+                      onClick={() =>
+                        navigate("/buy-now-checkout", { state: { buyNowProduct: item } })
+                      }
+                    >
+                      Buy Now
+                    </button>
                     <button
                       className="remove-btn"
                       onClick={() => removeFromCart(item.cart_id, item.size)}

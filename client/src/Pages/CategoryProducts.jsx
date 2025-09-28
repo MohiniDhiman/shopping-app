@@ -7,7 +7,8 @@ const CategoryProducts = () => {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
-  const apiUrl = import.meta.env.VITE_API_URL; // ✅ deployed backend
+  const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
+  const baseUrl = apiUrl.replace("/api", "");   // for full image path
 
   useEffect(() => {
     const fetchFilteredProducts = async () => {
@@ -17,9 +18,12 @@ const CategoryProducts = () => {
         const allProducts = await res.json();
 
         // Filter products by category ID
-        const filtered = allProducts.filter(
-          (prod) => prod.category_id === parseInt(categoryId)
-        );
+        const filtered = allProducts
+          .filter((prod) => prod.category_id === parseInt(categoryId))
+          .map((prod) => ({
+            ...prod,
+            image: prod.image ? `${baseUrl}/uploads/${encodeURIComponent(prod.image)}` : null
+          }));
 
         setProducts(filtered);
       } catch (error) {
@@ -28,7 +32,7 @@ const CategoryProducts = () => {
     };
 
     fetchFilteredProducts();
-  }, [categoryId, apiUrl]);
+  }, [categoryId, apiUrl, baseUrl]);
 
   const handleProductClick = (id) => {
     navigate(`/product/${id}`);
@@ -48,11 +52,10 @@ const CategoryProducts = () => {
               onClick={() => handleProductClick(prod.id)}
               style={{ cursor: "pointer" }}
             >
-             <img
-  src={prod.image ? `${apiUrl}/uploads/${encodeURIComponent(prod.image)}` : "https://via.placeholder.com/300"}
-  alt={prod.name}
-/>
-
+              <img
+                src={prod.image || "https://via.placeholder.com/300"}
+                alt={prod.name}
+              />
               <h3>{prod.name}</h3>
               <div className="price-info">
                 <span className="price">₹{prod.price}</span>
