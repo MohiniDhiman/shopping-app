@@ -11,6 +11,7 @@ const CategoryProducts = () => {
   const baseUrl = apiUrl.replace("/api", ""); // ✅ strip /api for image paths
 
   useEffect(() => {
+    console.log("Image URL:", `${baseUrl}/uploads/${prod.image}`);
     const fetchFilteredProducts = async () => {
       try {
         const res = await fetch(`${apiUrl}/products`);
