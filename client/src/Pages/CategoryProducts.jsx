@@ -42,31 +42,33 @@ const CategoryProducts = () => {
         {products.length === 0 ? (
           <p>No products found in this category.</p>
         ) : (
-          products.map((prod) => (
+          products.map((prod) => {
             console.log("Image URL:", `${baseUrl}/uploads/${prod.image}`);
-            <div
-              className="all-product-item"
-              key={prod.id}
-              onClick={() => handleProductClick(prod.id)}
-              style={{ cursor: "pointer" }}
-            >
-              <img
-                src={
-                  prod.image
-                    ? `${baseUrl}/uploads/${prod.image}`
-                    : "https://via.placeholder.com/300"
-                }
-                alt={prod.name}
-              />
-              <h3>{prod.name}</h3>
-              <div className="price-info">
-                <span className="price">₹{prod.price}</span>
-                {prod.old_price > 0 && (
-                  <span className="old-price">₹{prod.old_price}</span>
-                )}
+            return (
+              <div
+                className="all-product-item"
+                key={prod.id}
+                onClick={() => handleProductClick(prod.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <img
+                  src={
+                    prod.image
+                      ? `${baseUrl}/uploads/${prod.image}`
+                      : "https://via.placeholder.com/300"
+                  }
+                  alt={prod.name}
+                />
+                <h3>{prod.name}</h3>
+                <div className="price-info">
+                  <span className="price">₹{prod.price}</span>
+                  {prod.old_price > 0 && (
+                    <span className="old-price">₹{prod.old_price}</span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
