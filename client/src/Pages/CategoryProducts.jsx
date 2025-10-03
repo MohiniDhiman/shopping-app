@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./CategoryProducts.css"; 
+import "./CategoryProducts.css";
 import { useParams, useNavigate } from "react-router-dom";
 
 const CategoryProducts = () => {
@@ -7,8 +7,8 @@ const CategoryProducts = () => {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
-  const apiUrl = import.meta.env.VITE_API_URL; // deployed backend
-  const baseUrl = apiUrl.replace("/api", ""); // base path for images
+  const apiUrl = import.meta.env.VITE_API_URL; // ✅ deployed backend
+  const baseUrl = apiUrl.replace("/api", ""); // ✅ strip /api for image paths
 
   useEffect(() => {
     const fetchFilteredProducts = async () => {
@@ -17,15 +17,10 @@ const CategoryProducts = () => {
         if (!res.ok) throw new Error("Failed to fetch products");
         const allProducts = await res.json();
 
-        // Filter products by category ID and update image paths
-        const filtered = allProducts
-          .filter((prod) => prod.category_id === parseInt(categoryId))
-          .map((prod) => ({
-            ...prod,
-            image: prod.image
-              ? `${baseUrl}/uploads/${encodeURIComponent(prod.image)}`
-              : "https://via.placeholder.com/300",
-          }));
+        // Filter products by category ID
+        const filtered = allProducts.filter(
+          (prod) => prod.category_id === parseInt(categoryId)
+        );
 
         setProducts(filtered);
       } catch (error) {
@@ -34,7 +29,7 @@ const CategoryProducts = () => {
     };
 
     fetchFilteredProducts();
-  }, [categoryId, apiUrl, baseUrl]);
+  }, [categoryId, apiUrl]);
 
   const handleProductClick = (id) => {
     navigate(`/product/${id}`);
@@ -54,7 +49,14 @@ const CategoryProducts = () => {
               onClick={() => handleProductClick(prod.id)}
               style={{ cursor: "pointer" }}
             >
-              <img src={prod.image} alt={prod.name} />
+              <img
+                src={
+                  prod.image
+                    ? `${baseUrl}/uploads/${prod.image}`
+                    : "https://via.placeholder.com/300"
+                }
+                alt={prod.name}
+              />
               <h3>{prod.name}</h3>
               <div className="price-info">
                 <span className="price">₹{prod.price}</span>
