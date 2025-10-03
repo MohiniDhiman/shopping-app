@@ -11,7 +11,6 @@ const CategoryProducts = () => {
   const baseUrl = apiUrl.replace("/api", ""); // ✅ strip /api for image paths
 
   useEffect(() => {
-    console.log("Image URL:", `${baseUrl}/uploads/${prod.image}`);
     const fetchFilteredProducts = async () => {
       try {
         const res = await fetch(`${apiUrl}/products`);
@@ -44,6 +43,7 @@ const CategoryProducts = () => {
           <p>No products found in this category.</p>
         ) : (
           products.map((prod) => (
+            console.log("Image URL:", `${baseUrl}/uploads/${prod.image}`);
             <div
               className="all-product-item"
               key={prod.id}

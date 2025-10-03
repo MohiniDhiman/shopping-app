@@ -16,29 +16,19 @@ const Description = () => {
   const { addToCart } = useCart();
 
   const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
-  const baseUrl = apiUrl.replace("/api", ""); // for image paths
 
   useEffect(() => {
     const fetchProductAndRelated = async () => {
       try {
         const res = await axios.get(`${apiUrl}/products/${id}`);
         const currentProduct = res.data;
-
-        // ✅ Update main product image
-        if (currentProduct.image) {
-          currentProduct.image = `${baseUrl}/uploads/${encodeURIComponent(currentProduct.image)}`;
-        }
-
         setProduct(currentProduct);
 
         if (currentProduct.category_id) {
           const relatedRes = await axios.get(`${apiUrl}/products`);
-          const filtered = relatedRes.data
-            .filter(p => p.category_id === currentProduct.category_id && p.id !== parseInt(id))
-            .map(p => ({
-              ...p,
-              image: p.image ? `${baseUrl}/uploads/${encodeURIComponent(p.image)}` : null
-            }));
+          const filtered = relatedRes.data.filter(
+            p => p.category_id === currentProduct.category_id && p.id !== parseInt(id)
+          );
           setRelatedProducts(filtered);
         }
 
@@ -51,10 +41,12 @@ const Description = () => {
     };
 
     fetchProductAndRelated();
-  }, [id, apiUrl, baseUrl]);
+  }, [id, apiUrl]);
 
   const handleAddToCart = () => {
-    if (product.sizes?.length > 0 && !selectedSize) return alert("Select a size");
+    if (product.sizes?.length > 0 && !selectedSize) {
+      return alert("Select a size");
+    }
 
     const productToAdd = {
       id: product.id,
@@ -70,7 +62,9 @@ const Description = () => {
     alert("Product added to cart!");
   };
 
-  const toggleOffer = (id) => setOpenOffers((prev) => ({ ...prev, [id]: !prev[id] }));
+  const toggleOffer = (id) => {
+    setOpenOffers((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   if (loading) return <h2 className="not-found">Loading product...</h2>;
   if (!product) return <h2 className="not-found">Product Not Found</h2>;
@@ -84,10 +78,12 @@ const Description = () => {
 
         <div className="right-panel slide-in-right">
           <h2>{product.name}</h2>
+
           <p className="price">
             {product.old_price && <span className="old-price">₹{product.old_price}</span>}
             <span className="new-price">₹{product.price}</span>
           </p>
+
           <p className="desc">{product.description}</p>
 
           {product.sizes?.length > 0 && (
