@@ -37,13 +37,18 @@ router.post("/add-product", async (req, res) => {
     const {
       name,
       category_id,
-      image, // filename
+      image, // filename or full URL
       price,
       old_price,
       description,
       sizes,
       offers,
     } = req.body;
+
+    // ✅ Strip localhost prefix if present
+    const imageFilename = image?.startsWith("http://localhost:5000/uploads/")
+      ? image.replace("http://localhost:5000/uploads/", "")
+      : image;
 
     await client.query("BEGIN");
 
@@ -54,7 +59,7 @@ router.post("/add-product", async (req, res) => {
     const result = await client.query(insertQuery, [
       name,
       category_id,
-      image,
+      imageFilename,
       price,
       old_price,
       description,
@@ -184,6 +189,11 @@ router.put("/products/:id", async (req, res) => {
 
   const client = await pool.connect();
   try {
+    // ✅ Strip localhost prefix if present
+    const imageFilename = image?.startsWith("http://localhost:5000/uploads/")
+      ? image.replace("http://localhost:5000/uploads/", "")
+      : image;
+
     await client.query("BEGIN");
 
     const updateQuery = `
@@ -201,7 +211,7 @@ router.put("/products/:id", async (req, res) => {
     const result = await client.query(updateQuery, [
       name,
       category_id,
-      image,
+      imageFilename,
       price,
       old_price,
       description,

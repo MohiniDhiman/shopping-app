@@ -53,9 +53,11 @@ const CategoryProducts = () => {
               >
                 <img
                   src={
-                    prod.image
-                      ? `${baseUrl}/uploads/${prod.image}`
-                      : "https://via.placeholder.com/300"
+                   prod.image
+  ? prod.image.startsWith("http")
+    ? prod.image.replace("http://localhost:5000/uploads/", `${baseUrl}/uploads/`)
+    : `${baseUrl}/uploads/${prod.image}`
+  : "https://via.placeholder.com/300"
                   }
                   alt={prod.name}
                 />
