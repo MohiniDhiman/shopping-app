@@ -15,11 +15,6 @@ console.log(
   process.env.RAZORPAY_KEY_ID,
   process.env.RAZORPAY_SECRET
 );
-console.log(
-  "Razorpay ENV:",
-  process.env.RAZORPAY_KEY_ID,
-  process.env.RAZORPAY_SECRET
-);
 
 // ===== CREATE RAZORPAY ORDER =====
 router.post("/orders", async (req, res) => {
