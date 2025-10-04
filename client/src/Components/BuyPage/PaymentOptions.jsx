@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
   const [loading, setLoading] = useState(false);
-  const apiUrl = import.meta.env.VITE_API_URL; // use deployed backend
+  const navigate = useNavigate();
+  const apiUrl = import.meta.env.VITE_API_URL; // backend URL
 
   const handlePayment = async () => {
     try {
@@ -17,7 +19,6 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
 
       const userId = Number(user.id);
 
-      // Prepare payment payload with cart_id
       const paymentPayload = {
         amount,
         userId,
@@ -30,9 +31,6 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
         })),
       };
 
-      console.log("Payment payload:", paymentPayload);
-
-      // Create Razorpay order
       const res = await fetch(`${apiUrl}/payment/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -46,9 +44,8 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
         return;
       }
 
-      // Razorpay options
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY || "rzp_test_XXXXXXXXXXXXXX",
+        key: import.meta.env.VITE_RAZORPAY_KEY,
         amount: data.amount,
         currency: data.currency,
         name: "My Shop",
@@ -56,7 +53,7 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
         order_id: data.id,
         handler: async function (response) {
           try {
-            const verifyRes = await fetch(`${apiUrl}/payment/verify`, {
+            const verifyRes = await fetch(`${apiUrl}/payment/verify-payment`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -70,7 +67,12 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
             const verifyData = await verifyRes.json();
             if (verifyData.success) {
               alert("✅ Payment successful!");
-              onPaymentSuccess();
+
+              // Redirect to OrderSuccess page with order data
+              navigate("/order-success", { state: { order: data } });
+              
+              // Optional callback
+              if (onPaymentSuccess) onPaymentSuccess();
             } else {
               alert("❌ Payment verification failed!");
             }
