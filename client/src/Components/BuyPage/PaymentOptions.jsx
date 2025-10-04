@@ -36,7 +36,7 @@ const PaymentOptions = ({ amount, items, userId, saveAddress, clearCart }) => {
         order_id: data.id,
         handler: async function (response) {
           try {
-            const verifyRes = await fetch(`${apiUrl}/payment/verify-payment`, {
+            const verifyRes = await fetch(`${apiUrl}/payment/verify`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

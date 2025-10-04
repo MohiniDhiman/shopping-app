@@ -4,7 +4,7 @@ import "../../Pages/Checkout.css";
 const AddressForm = ({ setAddress }) => {
   const [addresses, setAddresses] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [selectedAddressId, setSelectedAddressId] = useState(null); // ✅ Track selected button
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     street: "",
@@ -42,50 +42,48 @@ const AddressForm = ({ setAddress }) => {
   };
 
   const handleSaveAddress = async () => {
-  if (!userId) return alert("User not logged in!");
+    if (!userId) return alert("User not logged in!");
 
-  if (
-    !formData.name ||
-    !formData.street ||
-    !formData.city ||
-    !formData.state ||
-    !formData.pincode ||
-    !formData.phone
-  ) {
-    return alert("Please fill in all fields before saving.");
-  }
+    const isEmpty = Object.values(formData).some((val) => !val.trim());
+    if (isEmpty) return alert("Please fill in all fields before saving.");
 
-  const payload = { ...formData, user_id: userId };
-  console.log("Sending address payload:", payload); // ✅ Debug log
+    const payload = { ...formData, user_id: userId };
+    console.log("Sending address payload:", payload);
 
-  try {
-    const res = await fetch(`${apiUrl}/address`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const res = await fetch(`${apiUrl}/address`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    const text = await res.text();
-    console.log("Raw response:", text); // ✅ Debug log
+      const text = await res.text();
+      console.log("Raw response:", text);
 
-    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-    const newAddress = JSON.parse(text);
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      const newAddress = JSON.parse(text);
 
-    setAddresses([...addresses, newAddress]);
-    setFormData({
-      name: "",
-      street: "",
-      city: "",
-      state: "",
-      pincode: "",
-      phone: "",
-    });
-    setShowForm(false);
-  } catch (err) {
-    console.error("Error saving address:", err);
-    alert("Failed to save address. Please try again.");
-  }
-};
+      // ✅ Avoid duplication
+      if (!addresses.some((a) => a.id === newAddress.id)) {
+        setAddresses([...addresses, newAddress]);
+      }
+
+      setFormData({
+        name: "",
+        street: "",
+        city: "",
+        state: "",
+        pincode: "",
+        phone: "",
+      });
+      setSelectedAddressId(newAddress.id); // ✅ Auto-select new address
+      setAddress(newAddress);              // ✅ Pass to parent
+      setShowForm(false);
+    } catch (err) {
+      console.error("Error saving address:", err);
+      alert("Failed to save address. Please try again.");
+    }
+  };
 
   const handleDeleteAddress = async (id) => {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
@@ -94,7 +92,10 @@ const AddressForm = ({ setAddress }) => {
       const res = await fetch(`${apiUrl}/address/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       setAddresses(addresses.filter((addr) => addr.id !== id));
-      if (selectedAddressId === id) setSelectedAddressId(null);
+      if (selectedAddressId === id) {
+        setSelectedAddressId(null);
+        setAddress(null); // ✅ Clear selection
+      }
     } catch (err) {
       console.error("Error deleting address:", err);
       alert("Failed to delete address. Please try again.");
@@ -102,8 +103,12 @@ const AddressForm = ({ setAddress }) => {
   };
 
   const handleUseAddress = (addr) => {
+    if (!addr || !addr.id) {
+      console.error("Invalid address selected:", addr);
+      return;
+    }
     setAddress(addr);
-    setSelectedAddressId(addr.id); // ✅ Highlight selected button
+    setSelectedAddressId(addr.id);
   };
 
   return (
@@ -112,8 +117,8 @@ const AddressForm = ({ setAddress }) => {
 
       {addresses.length > 0 && !showForm && (
         <div className="saved-addresses">
-          {addresses.map((addr, idx) => (
-            <div key={idx} className="address-card">
+          {addresses.map((addr) => (
+            <div key={addr.id} className="address-card">
               <p><b>{addr.name}</b></p>
               <p>{addr.street}, {addr.city}, {addr.state} - {addr.pincode}</p>
               <p>Phone: {addr.phone}</p>

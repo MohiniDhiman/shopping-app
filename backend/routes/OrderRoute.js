@@ -13,6 +13,7 @@ const razorpay = new Razorpay({
 
 // ================= CREATE NEW ORDER =================
 router.post("/", async (req, res) => {
+  console.log("Received address_id:", address_id);
   try {
     const {
       user_id,
