@@ -62,7 +62,7 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
     try {
       if (!userId) return alert("User not logged in!");
 
-      const addrRes = await fetch(`${apiUrl}/addresses`, {
+      const addrRes = await fetch(`${apiUrl}/address`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, ...address }),

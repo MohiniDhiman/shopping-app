@@ -33,7 +33,7 @@ app.use("/api/address", require("./routes/AddressRoute"));
 app.use("/api/orders", require("./routes/OrderRoute"));
 app.use("/api/payment", require("./routes/PaymentRoute"));
 app.use("/api/cart", require("./routes/CartRoute"));
-app.use("/api/payment", require("./routes/PaymentRoute"));
+// app.use("/api/payment", require("./routes/PaymentRoute"));
 
 // PostgreSQL Connection
 const pool = new Pool({

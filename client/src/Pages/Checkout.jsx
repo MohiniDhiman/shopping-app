@@ -85,11 +85,12 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
     try {
       if (!userId) return alert("User not logged in!");
 
-      const addrRes = await fetch(`${apiUrl}/addresses`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: userId, ...address }),
-      });
+     const addrRes = await fetch(`${apiUrl}/address`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ user_id: userId, ...address }),
+});
+
       const savedAddress = await addrRes.json();
       if (!addrRes.ok) return alert(savedAddress.error || "Failed to save address");
       const addressId = savedAddress.id;
