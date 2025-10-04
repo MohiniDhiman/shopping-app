@@ -122,34 +122,36 @@ router.get("/details/:orderId", async (req, res) => {
 });
 
 // ================= VERIFY PAYMENT =================
-// ================= VERIFY PAYMENT =================
 router.post("/verify-payment", async (req, res) => {
   try {
     const {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      userId,
-      payment_method, // frontend sends this
+      payment_method,
     } = req.body;
 
-    // Step 1: Verify signature
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
+    }
+
+    // Verify signature
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSign = crypto
       .createHmac("sha256", process.env.RAZORPAY_SECRET)
-      .update(sign.toString())
+      .update(sign)
       .digest("hex");
 
     if (razorpay_signature === expectedSign) {
-      // ✅ Payment verified
-
-      // Step 2: Update order status, method, increment attempts
+      // Payment verified → update order
       await pool.query(
-        `UPDATE orders 
-         SET status = 'paid',
-             payment_method = $1,
+        `UPDATE orders
+         SET status='paid',
+             payment_method=$1,
              payment_attempts = payment_attempts + 1
-         WHERE razorpay_order_id = $2`,
+         WHERE razorpay_order_id=$2`,
         [payment_method, razorpay_order_id]
       );
 
@@ -158,22 +160,23 @@ router.post("/verify-payment", async (req, res) => {
         message: "Payment verified & order updated",
       });
     } else {
-      // Increment attempts even if failed
+      // Verification failed → increment attempts
       await pool.query(
-        `UPDATE orders 
+        `UPDATE orders
          SET payment_attempts = payment_attempts + 1
-         WHERE razorpay_order_id = $1`,
+         WHERE razorpay_order_id=$1`,
         [razorpay_order_id]
       );
 
-      return res.json({
-        success: false,
-        message: "Payment verification failed",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Payment verification failed" });
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error verifying payment");
+    res
+      .status(500)
+      .json({ success: false, message: "Error verifying payment" });
   }
 });
 

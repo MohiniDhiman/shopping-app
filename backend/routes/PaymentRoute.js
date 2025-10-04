@@ -32,7 +32,7 @@ router.post("/orders", async (req, res) => {
 
     // Insert order in DB
     const orderResult = await client.query(
-      `INSERT INTO orders (user_id, total_amount, discount, final_amount, status, created_at, address_id)
+      `INSERT INTO orders (user_id, total_amount, discount, final_amount, status, created_at)
        VALUES ($1, $2, $3, $4, 'pending', NOW()) RETURNING id`,
       [userId, amount, 0, amount]
     );

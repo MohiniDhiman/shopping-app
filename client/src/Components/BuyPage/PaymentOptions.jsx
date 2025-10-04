@@ -53,7 +53,7 @@ const PaymentOptions = ({ amount, onPaymentSuccess, items }) => {
         order_id: data.id,
         handler: async function (response) {
           try {
-            const verifyRes = await fetch(`${apiUrl}/payment/verify`, {
+            const verifyRes = await fetch(`${apiUrl}/payment/verify-payment`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

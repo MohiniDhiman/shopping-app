@@ -80,6 +80,11 @@ h2, h3 {
   transform: scale(1.05);
   background: linear-gradient(45deg, #00c6ff, #007bff);
 }
+.selected-address {
+  border: 2px solid #4caf50;
+  background-color: #f0fff0;
+}
+
 
 /* Saved Address Cards */
 .saved-addresses {
