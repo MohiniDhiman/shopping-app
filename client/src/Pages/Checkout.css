@@ -80,12 +80,28 @@ h2, h3 {
   transform: scale(1.05);
   background: linear-gradient(45deg, #00c6ff, #007bff);
 }
-.selected-address {
-  border: 2px solid #4caf50;
-  background-color: #f0fff0;
+
+.use-btn {
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+  color: #333;
+  padding: 8px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
+.use-btn:hover {
+  background: linear-gradient(135deg, #e0e0e0, #d0d0d0);
+  transform: scale(1.05);
+}
 
+.use-btn.selected-btn {
+  background: linear-gradient(135deg, #ff6ec4, #7873f5); /* 💜 Pink to Indigo gradient */
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(120, 115, 245, 0.3);
+  transform: scale(1.05);
+  border: none; /* ✅ No border even when selected */
+}
 /* Saved Address Cards */
 .saved-addresses {
   display: flex;

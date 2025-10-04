@@ -4,6 +4,7 @@ import "../../Pages/Checkout.css";
 const AddressForm = ({ setAddress }) => {
   const [addresses, setAddresses] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState(null); // ✅ Track selected button
   const [formData, setFormData] = useState({
     name: "",
     street: "",
@@ -13,8 +14,7 @@ const AddressForm = ({ setAddress }) => {
     phone: "",
   });
 
-  const apiUrl = import.meta.env.VITE_API_URL; // deployed backend
-
+  const apiUrl = import.meta.env.VITE_API_URL;
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId = storedUser?.id;
 
@@ -42,32 +42,50 @@ const AddressForm = ({ setAddress }) => {
   };
 
   const handleSaveAddress = async () => {
-    if (!userId) return alert("User not logged in!");
-    try {
-      const res = await fetch(`${apiUrl}/address`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, user_id: userId }),
-      });
+  if (!userId) return alert("User not logged in!");
 
-      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-      const newAddress = await res.json();
+  if (
+    !formData.name ||
+    !formData.street ||
+    !formData.city ||
+    !formData.state ||
+    !formData.pincode ||
+    !formData.phone
+  ) {
+    return alert("Please fill in all fields before saving.");
+  }
 
-      setAddresses([...addresses, newAddress]);
-      setFormData({
-        name: "",
-        street: "",
-        city: "",
-        state: "",
-        pincode: "",
-        phone: "",
-      });
-      setShowForm(false);
-    } catch (err) {
-      console.error("Error saving address:", err);
-      alert("Failed to save address. Please try again.");
-    }
-  };
+  const payload = { ...formData, user_id: userId };
+  console.log("Sending address payload:", payload); // ✅ Debug log
+
+  try {
+    const res = await fetch(`${apiUrl}/address`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await res.text();
+    console.log("Raw response:", text); // ✅ Debug log
+
+    if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+    const newAddress = JSON.parse(text);
+
+    setAddresses([...addresses, newAddress]);
+    setFormData({
+      name: "",
+      street: "",
+      city: "",
+      state: "",
+      pincode: "",
+      phone: "",
+    });
+    setShowForm(false);
+  } catch (err) {
+    console.error("Error saving address:", err);
+    alert("Failed to save address. Please try again.");
+  }
+};
 
   const handleDeleteAddress = async (id) => {
     if (!window.confirm("Are you sure you want to delete this address?")) return;
@@ -76,6 +94,7 @@ const AddressForm = ({ setAddress }) => {
       const res = await fetch(`${apiUrl}/address/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
       setAddresses(addresses.filter((addr) => addr.id !== id));
+      if (selectedAddressId === id) setSelectedAddressId(null);
     } catch (err) {
       console.error("Error deleting address:", err);
       alert("Failed to delete address. Please try again.");
@@ -84,6 +103,7 @@ const AddressForm = ({ setAddress }) => {
 
   const handleUseAddress = (addr) => {
     setAddress(addr);
+    setSelectedAddressId(addr.id); // ✅ Highlight selected button
   };
 
   return (
@@ -98,7 +118,12 @@ const AddressForm = ({ setAddress }) => {
               <p>{addr.street}, {addr.city}, {addr.state} - {addr.pincode}</p>
               <p>Phone: {addr.phone}</p>
               <div className="address-actions">
-                <button onClick={() => handleUseAddress(addr)}>Use This Address</button>
+                <button
+                  className={`use-btn ${selectedAddressId === addr.id ? "selected-btn" : ""}`}
+                  onClick={() => handleUseAddress(addr)}
+                >
+                  Use This Address
+                </button>
                 <button className="delete-btn" onClick={() => handleDeleteAddress(addr.id)}>Delete</button>
               </div>
             </div>

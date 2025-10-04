@@ -85,15 +85,27 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
     try {
       if (!userId) return alert("User not logged in!");
 
-     const addrRes = await fetch(`${apiUrl}/address`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ user_id: userId, ...address }),
-});
+     let addressId;
 
-      const savedAddress = await addrRes.json();
-      if (!addrRes.ok) return alert(savedAddress.error || "Failed to save address");
-      const addressId = savedAddress.id;
+if (address?.id) {
+  // ✅ Use existing saved address
+  addressId = address.id;
+} else {
+  // 🆕 Save new address if not already saved
+  const addrRes = await fetch(`${apiUrl}/address`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      name: address.name || "Customer",
+      ...address,
+    }),
+  });
+
+  const savedAddress = await addrRes.json();
+  if (!addrRes.ok) return alert(savedAddress.error || "Failed to save address");
+  addressId = savedAddress.id;
+}
 
       const orderPayload = {
         user_id: userId,
@@ -136,17 +148,31 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
       <div className="checkout-left">
         <h2>Checkout</h2>
         <AddressForm userId={userId} setAddress={setAddress} />
-        <PaymentOptions
-          amount={finalAmount}
-          onPaymentSuccess={handlePaymentSuccess}
-          items={itemsWithOffers.map((item) => ({
-            cart_id: item.cart_id,
-            product_id: item.product_id,
-            quantity: item.quantity,
-            price: Number(item.priceWithOffer) || 0,
-            offer_applied: item.appliedOffer || null,
-          }))}
-        />
+       <PaymentOptions
+  amount={finalAmount}
+  items={itemsWithOffers.map((item) => ({
+    cart_id: item.cart_id,
+    product_id: item.product_id,
+    quantity: item.quantity,
+    price: Number(item.priceWithOffer) || 0,
+    offer_applied: item.appliedOffer || null,
+  }))}
+  userId={userId}
+  saveAddress={async () => {
+    const res = await fetch(`${apiUrl}/address`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: userId, ...address }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Failed to save address");
+      return null;
+    }
+    return data.id;
+  }}
+  clearCart={clearCart}
+/>
       </div>
 
       <div className="checkout-right">

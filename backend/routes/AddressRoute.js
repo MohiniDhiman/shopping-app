@@ -9,6 +9,11 @@ router.post("/", async (req, res) => {
   try {
     const { user_id, name, street, city, state, pincode, phone } = req.body;
 
+    // ✅ Validate required fields
+    if (!user_id || !name || !street || !city || !state || !pincode || !phone) {
+      return res.status(400).json({ error: "Missing required address fields" });
+    }
+
     const result = await pool.query(
       `INSERT INTO addresses (user_id, name, street, city, state, pincode, phone, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) RETURNING *`,
@@ -18,10 +23,9 @@ router.post("/", async (req, res) => {
     res.json(result.rows[0]);
   } catch (err) {
     console.error("Error inserting address:", err);
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ error: err.message || "Database error" });
   }
 });
-
 // ✅ Get all addresses for a user
 router.get("/:userId", async (req, res) => {
   try {
