@@ -8,7 +8,16 @@ export const CartProvider = ({ children }) => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId = storedUser?.id;
 
-  const apiUrl = import.meta.env.VITE_API_URL; // ✅ deployed backend
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const baseUrl = apiUrl.replace("/api", "");
+
+  const getImageUrl = (img) => {
+    return img
+      ? img.startsWith("http")
+        ? img.replace("http://localhost:5000/uploads/", `${baseUrl}/uploads/`)
+        : `${baseUrl}/uploads/${img}`
+      : "https://via.placeholder.com/300";
+  };
 
   useEffect(() => {
     if (!userId) return;
@@ -24,7 +33,7 @@ export const CartProvider = ({ children }) => {
           appliedOffer: item.offer || null,
           price: item.price,
           offers: item.offers || [],
-          image: item.image || "",
+          image: getImageUrl(item.image),
           name: item.name || "",
         }));
         setCart(mappedCart);
@@ -84,7 +93,7 @@ export const CartProvider = ({ children }) => {
         appliedOffer: res.data.offer || null,
         price: res.data.price,
         offers: res.data.offers || [],
-        image: res.data.image || "",
+        image: getImageUrl(res.data.image),
         name: res.data.name || "",
       };
       newItem.appliedOffer = getBestOffer(newItem);
@@ -124,7 +133,7 @@ export const CartProvider = ({ children }) => {
         appliedOffer: res.data.offer || null,
         price: res.data.price,
         offers: res.data.offers || [],
-        image: res.data.image || "",
+        image: getImageUrl(res.data.image),
         name: res.data.name || "",
       };
       updatedItem.appliedOffer = getBestOffer(updatedItem);

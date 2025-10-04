@@ -15,7 +15,8 @@ const Description = () => {
   const [openOffers, setOpenOffers] = useState({});
   const { addToCart } = useCart();
 
-  const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const baseUrl = apiUrl.replace("/api", "");
 
   useEffect(() => {
     const fetchProductAndRelated = async () => {
@@ -66,6 +67,14 @@ const Description = () => {
     setOpenOffers((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const getImageUrl = (img) => {
+    return img
+      ? img.startsWith("http")
+        ? img.replace("http://localhost:5000/uploads/", `${baseUrl}/uploads/`)
+        : `${baseUrl}/uploads/${img}`
+      : "https://via.placeholder.com/300";
+  };
+
   if (loading) return <h2 className="not-found">Loading product...</h2>;
   if (!product) return <h2 className="not-found">Product Not Found</h2>;
 
@@ -73,7 +82,7 @@ const Description = () => {
     <>
       <div className="product-description animated-fade">
         <div className="left-panel slide-in-left">
-          <img src={product.image} alt={product.name} />
+          <img src={getImageUrl(product.image)} alt={product.name} />
         </div>
 
         <div className="right-panel slide-in-right">
@@ -168,7 +177,7 @@ const Description = () => {
           {relatedProducts.slice(0, 5).map((item) => (
             <Link to={`/product/${item.id}`} key={item.id} className="related-product-link">
               <div className="related-product-item">
-                <img src={item.image} alt={item.name} />
+                <img src={getImageUrl(item.image)} alt={item.name} />
                 <h3>{item.name}</h3>
                 <div className="price-info">
                   <span className="price">₹{item.price}</span>

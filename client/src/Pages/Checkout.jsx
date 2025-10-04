@@ -5,8 +5,8 @@ import PaymentOptions from "../Components/BuyPage/PaymentOptions";
 import { useCart } from "./context/CartContext";
 import { useNavigate } from "react-router-dom";
 
-// ✅ Import API URL from Vite environment
 const apiUrl = import.meta.env.VITE_API_URL;
+const baseUrl = apiUrl.replace("/api", "");
 
 const Checkout = ({ singleProduct, userId: propUserId }) => {
   const { cart, clearCart } = useCart();
@@ -18,9 +18,16 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
   const GST_PERCENT = 10;
   const PLATFORM_FEE = 5;
 
-  // Persist userId: prop first, fallback to localStorage
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId = propUserId || storedUser?.id;
+
+  const getImageUrl = (img) => {
+    return img
+      ? img.startsWith("http")
+        ? img.replace("http://localhost:5000/uploads/", `${baseUrl}/uploads/`)
+        : `${baseUrl}/uploads/${img}`
+      : "https://via.placeholder.com/150";
+  };
 
   const itemsWithOffers = productsToShow.map((item) => {
     const basePrice = Number(item.price) || 0;
@@ -74,12 +81,10 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
   const gst = (subtotal * GST_PERCENT) / 100;
   const finalAmount = subtotal + gst + PLATFORM_FEE;
 
-  // Handle order save after successful payment
   const handlePaymentSuccess = async () => {
     try {
       if (!userId) return alert("User not logged in!");
 
-      // Save address
       const addrRes = await fetch(`${apiUrl}/addresses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +94,6 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
       if (!addrRes.ok) return alert(savedAddress.error || "Failed to save address");
       const addressId = savedAddress.id;
 
-      // Save order
       const orderPayload = {
         user_id: userId,
         address_id: addressId,
@@ -128,7 +132,6 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
 
   return (
     <div className="checkout-container">
-      {/* Left Panel */}
       <div className="checkout-left">
         <h2>Checkout</h2>
         <AddressForm userId={userId} setAddress={setAddress} />
@@ -145,7 +148,6 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
         />
       </div>
 
-      {/* Right Panel */}
       <div className="checkout-right">
         <h2>Order Summary</h2>
         {itemsWithOffers.length === 0 ? (
@@ -154,7 +156,7 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
           <>
             {itemsWithOffers.map((item) => (
               <div className="summary-item" key={`${item.cart_id}-${item.size}`}>
-                <img src={item.image || "https://via.placeholder.com/150"} alt={item.name} />
+                <img src={getImageUrl(item.image)} alt={item.name} />
                 <div>
                   <h4>{item.name}</h4>
                   <p>Unit Price: ₹{Number(item.price).toFixed(2)}</p>
@@ -163,7 +165,7 @@ const Checkout = ({ singleProduct, userId: propUserId }) => {
 
                   {item.appliedOffer && (
                     <p className="offer-text">
-                      Best Offer Applied:{" none"}
+                      Best Offer Applied:{" "}
                       {item.appliedOffer.discount_type === "percentage"
                         ? `${item.appliedOffer.discount_value}% off`
                         : item.appliedOffer.discount_type === "flat"

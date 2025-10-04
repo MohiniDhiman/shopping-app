@@ -18,6 +18,17 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
   const product = location.state?.buyNowProduct;
   if (!product) return <p>No product selected for Buy Now.</p>;
 
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const baseUrl = apiUrl.replace("/api", "");
+
+  const getImageUrl = (img) => {
+    return img
+      ? img.startsWith("http")
+        ? img.replace("http://localhost:5000/uploads/", `${baseUrl}/uploads/`)
+        : `${baseUrl}/uploads/${img}`
+      : "https://via.placeholder.com/300";
+  };
+
   const basePrice = Number(product.price) || 0;
   let totalPrice = basePrice * product.quantity;
   let appliedOffer = null;
@@ -47,13 +58,10 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
   const gst = (subtotal * GST_PERCENT) / 100;
   const finalAmount = subtotal + gst + PLATFORM_FEE;
 
-  const apiUrl = import.meta.env.VITE_API_URL; // ✅ use deployed backend
-
   const handlePaymentSuccess = async () => {
     try {
       if (!userId) return alert("User not logged in!");
 
-      // Save address
       const addrRes = await fetch(`${apiUrl}/addresses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,7 +71,6 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
       if (!addrRes.ok) return alert(savedAddress.error || "Failed to save address");
       const addressId = savedAddress.id;
 
-      // Save order
       const orderPayload = {
         user_id: userId,
         address_id: addressId,
@@ -122,7 +129,7 @@ const BuyNowCheckout = ({ userId: propUserId }) => {
       <div className="checkout-right">
         <h2>Order Summary</h2>
         <div className="summary-item" key={`${product.product_id}-${product.size}`}>
-          <img src={product.image} alt={product.name} />
+          <img src={getImageUrl(product.image)} alt={product.name} />
           <div>
             <h4>{product.name}</h4>
             <p>Unit Price: ₹{Number(product.price).toFixed(2)}</p>

@@ -8,6 +8,7 @@ const AllProducts = () => {
   const [error, setError] = useState("");
 
   const apiUrl = import.meta.env.VITE_API_URL; // deployed backend URL
+  const baseUrl = apiUrl.replace("/api", ""); // strip /api for image paths
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -27,6 +28,14 @@ const AllProducts = () => {
     fetchProducts();
   }, [apiUrl]);
 
+  const getImageUrl = (img) => {
+    return img
+      ? img.startsWith("http")
+        ? img.replace("http://localhost:5000/uploads/", `${baseUrl}/uploads/`)
+        : `${baseUrl}/uploads/${img}`
+      : "https://via.placeholder.com/300";
+  };
+
   if (loading) return <p>Loading products...</p>;
   if (error) return <p>{error}</p>;
 
@@ -38,7 +47,7 @@ const AllProducts = () => {
         {products.map((prod) => (
           <Link to={`/product/${prod.id}`} className="all-product-item" key={prod.id}>
             <img
-              src={prod.image || "https://via.placeholder.com/300"}
+              src={getImageUrl(prod.image)}
               alt={prod.name}
             />
             <h3>{prod.name}</h3>
