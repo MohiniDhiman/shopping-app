@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ManageOffers.css";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const ManageOffers = () => {
   const [offers, setOffers] = useState([]);
   const [form, setForm] = useState({
@@ -17,7 +19,6 @@ const ManageOffers = () => {
     id: null,
   });
 
-  // Format ISO date to yyyy-MM-dd
   const formatDate = (isoDate) => {
     if (!isoDate) return "";
     const date = new Date(isoDate);
@@ -27,11 +28,10 @@ const ManageOffers = () => {
     return `${yyyy}-${mm}-${dd}`;
   };
 
-  // Fetch Offers
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/offers");
+        const res = await axios.get(`${apiUrl}/offers`);
         const formattedOffers = res.data.map((offer) => ({
           ...offer,
           start_date: formatDate(offer.start_date),
@@ -47,31 +47,28 @@ const ManageOffers = () => {
     fetchOffers();
   }, []);
 
-  // Handle Input Change
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Add or Update Offer
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (form.id) {
-        // Update existing offer
-        const res = await axios.put(
-          `http://localhost:5000/api/offers/${form.id}`,
-          form
-        );
+        const res = await axios.put(`${apiUrl}/offers/${form.id}`, form);
         setOffers(
           offers.map((o) =>
             o.id === form.id
-              ? { ...res.data.offer, start_date: formatDate(res.data.offer.start_date), end_date: formatDate(res.data.offer.end_date) }
+              ? {
+                  ...res.data.offer,
+                  start_date: formatDate(res.data.offer.start_date),
+                  end_date: formatDate(res.data.offer.end_date),
+                }
               : o
           )
         );
       } else {
-        // Add new offer
-        const res = await axios.post("http://localhost:5000/api/offers", form);
+        const res = await axios.post(`${apiUrl}/offers`, form);
         setOffers([
           {
             ...res.data.offer,
@@ -82,7 +79,6 @@ const ManageOffers = () => {
         ]);
       }
 
-      // Reset form
       setForm({
         title: "",
         description: "",
@@ -100,17 +96,15 @@ const ManageOffers = () => {
     }
   };
 
-  // Delete Offer
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/offers/${id}`);
+      await axios.delete(`${apiUrl}/offers/${id}`);
       setOffers(offers.filter((o) => o.id !== id));
     } catch (err) {
       console.error("Error deleting offer:", err);
     }
   };
 
-  // Edit Offer
   const handleEdit = (offer) => {
     setForm({
       title: offer.title,
@@ -130,7 +124,6 @@ const ManageOffers = () => {
     <div className="manage-offers-container">
       <h2>🎁 Manage Offers</h2>
 
-      {/* Offer Form */}
       <form className="offer-form" onSubmit={handleSubmit}>
         <input
           type="text"
@@ -147,7 +140,6 @@ const ManageOffers = () => {
           onChange={handleChange}
         ></textarea>
 
-        {/* Offer Type */}
         <select
           name="discount_type"
           value={form.discount_type}
@@ -159,7 +151,6 @@ const ManageOffers = () => {
           <option value="free_shipping">Free Shipping</option>
         </select>
 
-        {/* Conditional Fields */}
         {form.discount_type === "percentage" && (
           <input
             type="number"
@@ -230,7 +221,6 @@ const ManageOffers = () => {
         </button>
       </form>
 
-      {/* Offers List */}
       <div className="offers-list">
         {offers.length === 0 ? (
           <p>No offers found.</p>
@@ -276,4 +266,3 @@ const ManageOffers = () => {
 };
 
 export default ManageOffers;
-

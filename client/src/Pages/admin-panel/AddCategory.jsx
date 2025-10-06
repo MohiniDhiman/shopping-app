@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./AddCategory.css";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+const baseUrl = apiUrl.replace("/api", "");
+
 const AddCategory = () => {
   const [name, setName] = useState("");
   const [image, setImage] = useState(null);
@@ -13,7 +16,7 @@ const AddCategory = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/categories");
+      const res = await fetch(`${apiUrl}/categories`);
       const data = await res.json();
       setCategories(data);
     } catch (error) {
@@ -35,7 +38,7 @@ const AddCategory = () => {
     formData.append("image", image);
 
     try {
-      const res = await fetch("http://localhost:5000/api/categories/add", {
+      const res = await fetch(`${apiUrl}/categories/add`, {
         method: "POST",
         body: formData,
       });
@@ -56,7 +59,7 @@ const AddCategory = () => {
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/categories/${id}`, {
+      const res = await fetch(`${apiUrl}/categories/${id}`, {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete category");
@@ -87,20 +90,19 @@ const AddCategory = () => {
 
       <h3 className="category-subheading">Uploaded Categories</h3>
       <div className="category-grid">
-      {categories.map((cat) => (
-  <div className="category-card" key={cat.id}>
-    <img
-      src={`http://localhost:5000/uploads/categories/${cat.image}`}
-      alt={cat.name}
-      className="category-image"
-    />
-
-    <div className="category-info">
-      <span>{cat.name}</span>
-      <button onClick={() => handleDelete(cat.id)}>Delete</button>
-    </div>
-  </div>
-))}
+        {categories.map((cat) => (
+          <div className="category-card" key={cat.id}>
+            <img
+              src={`${baseUrl}/uploads/categories/${cat.image}`}
+              alt={cat.name}
+              className="category-image"
+            />
+            <div className="category-info">
+              <span>{cat.name}</span>
+              <button onClick={() => handleDelete(cat.id)}>Delete</button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

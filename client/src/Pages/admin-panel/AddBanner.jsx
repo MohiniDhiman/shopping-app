@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./AddBanner.css";
 
+const apiUrl = import.meta.env.VITE_API_URL;
+const baseUrl = apiUrl.replace("/api", "");
+
 const AddBanner = () => {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -11,7 +14,7 @@ const AddBanner = () => {
 
   const fetchBanners = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/banners");
+      const res = await fetch(`${apiUrl}/banners`);
       const data = await res.json();
       setBanners(data);
     } catch (err) {
@@ -45,11 +48,11 @@ const AddBanner = () => {
     formData.append("link", link);
 
     try {
-      let url = "http://localhost:5000/api/banners/upload-image";
+      let url = `${apiUrl}/banners/upload-image`;
       let method = "POST";
 
       if (editingBannerId) {
-        url = `http://localhost:5000/api/banners/${editingBannerId}`;
+        url = `${apiUrl}/banners/${editingBannerId}`;
         method = "PUT";
       }
 
@@ -63,7 +66,6 @@ const AddBanner = () => {
       const data = await res.json();
       console.log(method === "PUT" ? "Edited:" : "Uploaded:", data);
 
-      // Clear form
       setImage(null);
       setLink("");
       setPreview(null);
@@ -79,13 +81,13 @@ const AddBanner = () => {
   const handleEdit = (banner) => {
     setEditingBannerId(banner.id);
     setLink(banner.link);
-    setPreview(`http://localhost:5000/uploads/banner/${banner.image_filename}`);
-    setImage(null); // Optional: let user upload a new one if needed
+    setPreview(`${baseUrl}/uploads/banner/${banner.image_filename}`);
+    setImage(null);
   };
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/banners/${id}`, {
+      const response = await fetch(`${apiUrl}/banners/${id}`, {
         method: "DELETE",
       });
 
@@ -145,7 +147,7 @@ const AddBanner = () => {
           <div key={banner.id} className="banner-item">
             <a href={banner.link} target="_blank" rel="noopener noreferrer">
               <img
-                src={`http://localhost:5000/uploads/banner/${banner.image_filename}`}
+                src={`${baseUrl}/uploads/banner/${banner.image_filename}`}
                 alt="banner"
                 className="banner-img"
               />
