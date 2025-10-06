@@ -7,34 +7,25 @@ require("dotenv").config();
 const app = express();
 const expressListRoutes = require("express-list-endpoints");
 
-// Middleware
+// ------------------ Middleware ------------------
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// ------------------ API Routes ------------------
 app.use("/api/auth", require("./routes/auth"));
-
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const bannerRoutes = require("./routes/BannerRoute");
-app.use("/api/banners", bannerRoutes);
-
-const categoryRoutes = require("./routes/CategoryRoute");
-app.use("/api/categories", categoryRoutes);
-
-const productRoutes = require("./routes/ProductRoutes");
-app.use("/api", productRoutes);
-
-const offersRoute = require("./routes/offerRoutes");
-app.use("/api/offers", offersRoute);
-
+app.use("/api/banners", require("./routes/BannerRoute"));
+app.use("/api/categories", require("./routes/CategoryRoute"));
+app.use("/api", require("./routes/ProductRoutes")); // keep /api prefix
+app.use("/api/offers", require("./routes/offerRoutes"));
 app.use("/api/address", require("./routes/AddressRoute"));
 app.use("/api/orders", require("./routes/OrderRoute"));
 app.use("/api/payment", require("./routes/PaymentRoute"));
 app.use("/api/cart", require("./routes/CartRoute"));
 
-// PostgreSQL Connection
+// ------------------ PostgreSQL Connection ------------------
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -43,21 +34,17 @@ const pool = new Pool({
   port: parseInt(process.env.DB_PORT),
 });
 
-// Base URL (for Render / local)
+// ------------------ Base URL for Images ------------------
 const BASE_URL =
   process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
 
-// Example Products API with image URL fix
 app.get("/api/products", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM products");
-
-    // Fix image paths
     const products = result.rows.map((p) => ({
       ...p,
       image: p.image ? `${BASE_URL}/uploads/${p.image}` : null,
     }));
-
     res.json(products);
   } catch (err) {
     console.error(err);
@@ -65,9 +52,21 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-// List all routes for debugging
+// ------------------ List All Routes (Debug) ------------------
 console.log(expressListRoutes(app));
 
+// ------------------ Serve Vite Frontend ------------------
+// ------------------ Serve Vite Frontend ------------------
+const clientBuildPath = path.join(__dirname, "client/dist");
+app.use(express.static(clientBuildPath));
+
+// SPA Fallback for frontend routes
+// Change from "*" to regex to avoid path-to-regexp error
+app.get(/^\/.*$/, (req, res) => {
+  res.sendFile(path.join(clientBuildPath, "index.html"));
+});
+
+// ------------------ Start Server ------------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Server is running on port ${PORT}`);

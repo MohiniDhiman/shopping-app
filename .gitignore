@@ -9,3 +9,5 @@ backend/.env
 # Optional: OS / IDE files
 .DS_Store
 *.log
+
+client/dist/ 
