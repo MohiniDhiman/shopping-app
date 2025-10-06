@@ -8,6 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET; // store in .env for production
 // Signup (public)
 exports.signup = async (req, res) => {
   const { name, email, mobile, password } = req.body;
+  console.log("Login attempt for:", email);
 
   if (!name || !email || !mobile || !password) {
     return res.status(400).json({ message: "All fields are required" });

@@ -6,6 +6,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px; /* Small padding for mobile */
+  box-sizing: border-box;
 }
 
 /* Form styling */
@@ -20,10 +22,11 @@
   text-align: center;
 }
 
+/* Heading */
 .auth-form h2 {
   margin-bottom: 24px;
   font-size: 24px;
-  color: #333;
+  color: #000; /* Black text */
 }
 
 /* Input fields */
@@ -38,6 +41,8 @@
   border-radius: 8px;
   font-size: 16px;
   box-sizing: border-box;
+  color: #000; /* Black text */
+  background-color: #fff; /* White background */
 }
 
 /* Button styling */
@@ -72,4 +77,30 @@
 
 .auth-link:hover {
   text-decoration: underline;
+}
+
+/* ===== RESPONSIVE STYLING ===== */
+@media (max-width: 480px) {
+  .auth-form {
+    padding: 30px 20px;
+    max-width: 100%;
+  }
+
+  .auth-form h2 {
+    font-size: 20px;
+  }
+
+  .auth-form input {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .auth-form button {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .auth-footer {
+    font-size: 12px;
+  }
 }
