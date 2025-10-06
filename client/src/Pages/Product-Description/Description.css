@@ -267,31 +267,30 @@ h2 {
 }
 
 /* ===== Mobile Responsive Layout ===== */
+/* Mobile Responsive Layout (image left, description right) */
 @media (max-width: 768px) {
   .product-description {
-    flex-direction: column; /* Stack vertically */
-    padding: 15px; /* Mobile-friendly padding */
-    gap: 20px; /* Space between sections */
-    width: 100%;
+    flex-direction: row; /* Keep image left, description right */
+    padding: 15px;
+    gap: 15px;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: auto; /* Allow scrolling if needed */
   }
 
   .left-panel,
   .right-panel {
-    flex: 1 1 100%;
-    width: 100%;
-    margin: 0 auto;
+    flex: 0 0 50%; /* Each take 50% width */
   }
 
   .left-panel img {
     max-width: 100%;
-    max-height: 300px; /* Fit mobile screen */
+    max-height: 300px;
     object-fit: cover;
     border-radius: 15px;
-    margin-bottom: 15px;
   }
 
   .right-panel {
-    text-align: left; /* Align text properly */
+    text-align: left;
   }
 
   h2 {
@@ -308,13 +307,26 @@ h2 {
   }
 
   .action-buttons {
-    flex-direction: column; /* Stack buttons vertically */
+    flex-direction: column;
     gap: 12px;
   }
 
   .btn {
-    width: 100%; /* Full-width buttons on mobile */
+    width: 100%;
     padding: 10px;
     font-size: 0.95rem;
+  }
+
+  /* Related products scrollable horizontal */
+  .related-product-list {
+    display: flex;
+    overflow-x: auto;
+    gap: 15px;
+    padding-bottom: 10px;
+  }
+
+  .related-product-item {
+    flex: 0 0 auto;
+    width: 200px; /* Fixed width for horizontal scroll */
   }
 }
