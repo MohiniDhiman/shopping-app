@@ -203,7 +203,7 @@ body, html {
 
 
 /* Responsive Cards */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .cards-section {
     flex-direction: column;
     align-items: center;

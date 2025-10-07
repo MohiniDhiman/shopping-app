@@ -70,17 +70,19 @@
 }
 
 /* ===== Mobile Responsive ===== */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 600px) {
   .homepage-banner-item {
-    min-height: 240px; /* reasonable mobile height */
-    height: auto;
+    height: auto; /* let image define height */
+    aspect-ratio: auto; /* let it scale naturally */
   }
 
   .homepage-banner-image {
-    width: 100vw;
-    height: 100%;
-    max-height: none;
+    width: 100%;
+    height: auto;       /* maintain full image */
+    object-fit: contain; /* prevent cropping */
   }
+}
+
 
   .banner-section,
   .homepage-banner-wrapper {
