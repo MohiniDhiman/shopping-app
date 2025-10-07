@@ -46,12 +46,8 @@ router.post("/add-product", async (req, res) => {
       offers,
     } = req.body;
 
-    // ✅ Strip localhost prefix if present
-    const imageFilename = image?.startsWith("http://localhost:5000/uploads/")
-      ? image.replace("http://localhost:5000/uploads/", "")
-      : image;
-
-    await client.query("BEGIN");
+    // Ensure we only store filename in DB
+    const imageFilename = req.body.image?.split("/").pop(); // always take last part
 
     const insertQuery = `
       INSERT INTO products (name, category_id, image, price, old_price, description, sizes)
