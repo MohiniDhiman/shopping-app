@@ -363,15 +363,10 @@ const AddProduct = () => {
         <ul className="product-list">
           {products.map((product) => (
             <li key={product.id} className="product-item">
-              <img
-                src={
-                  product.image?.startsWith("http")
-                    ? product.image.replace("http://localhost:5000", baseUrl)
-                    : `${baseUrl}/uploads/products/${product.image}`
-                }
-                alt={product.name}
-                className="product-image"
-              />
+             <img
+  src={product.image_url || `${baseUrl}/uploads/${product.image}`}
+  alt={product.name}
+  className="product-image"/>
               <div className="product-info">
                 <h4>{product.name}</h4>
                 <p>₹{product.price}</p>
