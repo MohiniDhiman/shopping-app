@@ -267,81 +267,91 @@ h2 {
 }
 
 /* ===== Mobile Responsive Layout ===== */
-@media (max-width: 768px) {
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: #fff; /* Set consistent background */
-  }
-
+/* ===== Mobile & Tablet Responsive Layout ===== */
+@media (max-width: 1024px) {
   .product-description {
-    display: flex;
-    flex-direction: row;
-    padding: 15px;
-    gap: 15px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    background-color: #fff; /* Ensure full background */
-    width: 100%;
-    min-height: 100vh; /* Cover full screen height */
+    flex-wrap: wrap;
+    padding: 40px 20px;
+    gap: 20px;
   }
 
   .left-panel,
   .right-panel {
-    flex: 0 0 50%;
-    background-color: inherit; /* Inherit background */
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .left-panel img {
+    max-width: 100%;
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Keep image left, description right on larger mobiles */
+  .product-description {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px 15px;
+  }
+
+  .left-panel,
+  .right-panel {
+    flex: 1 1 50%;
+    max-width: 50%;
   }
 
   .left-panel img {
     max-width: 100%;
     max-height: 300px;
-    object-fit: cover;
     border-radius: 15px;
   }
 
   .right-panel {
-    text-align: left;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-  }
-
-  .category,
-  .price,
-  .desc,
-  .size-options {
-    font-size: 0.95rem;
-    margin-bottom: 12px;
+    padding-left: 15px;
   }
 
   .action-buttons {
-    display: flex;
     flex-direction: column;
     gap: 12px;
   }
 
   .btn {
     width: 100%;
-    padding: 10px;
-    font-size: 0.95rem;
   }
 
+  /* Related products grid: 2 per row */
   .related-product-list {
-    display: flex;
-    overflow-x: auto;
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    padding-bottom: 10px;
-    background-color: #fff; /* Match background */
+    margin: 0 auto;
   }
 
   .related-product-item {
-    flex: 0 0 auto;
-    width: 200px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Small mobile: image on top, description below */
+  .product-description {
+    flex-direction: column;
+  }
+
+  .left-panel,
+  .right-panel {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .left-panel img {
+    max-height: 250px;
+  }
+
+  /* Related products: 1 per row */
+  .related-product-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
