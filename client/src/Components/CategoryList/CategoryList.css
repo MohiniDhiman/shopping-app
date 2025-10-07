@@ -80,7 +80,7 @@
 }
 
 /* ================= MOBILE: overlay CENTERED with white transparency ================= */
-@media (max-width: 768px) {
+@media (max-width:576px) {
   .category-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
@@ -130,9 +130,9 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 576px) {
   .category-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 0.8rem;
     padding: 0.5rem;
   }
