@@ -70,7 +70,7 @@
 }
 
 /* ===== Mobile Responsive ===== */
-@media screen and (max-width: 576px) {
+@media screen and (max-width: 768px) {
   .homepage-banner-item {
     min-height: 240px; /* reasonable mobile height */
     height: auto;
