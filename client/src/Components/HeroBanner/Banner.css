@@ -1,99 +1,75 @@
 /* ===== Banner Section ===== */
 .banner-section {
-  width: 100vw; /* full viewport width */
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  background-color: #fdfdfd; /* consistent background */
+  background-color: #fdfdfd; /* white background */
   overflow: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .homepage-banner-wrapper {
-  width: 100vw; /* full viewport width */
+  width: 100%;
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  margin: 0; /* remove any default margin */
-  padding: 0; /* remove padding to avoid extra gaps */
+  scrollbar-width: thin; /* minimal scrollbar */
+  scrollbar-color: #ccc transparent;
+  margin: 0;
+  padding: 0;
+  scrollbar-gutter: stable; /* prevents extra space */
 }
 
 .homepage-banner-wrapper::-webkit-scrollbar {
-  display: none;
+  height: 6px; /* small horizontal scrollbar */
+}
+
+.homepage-banner-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.homepage-banner-wrapper::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
 }
 
 .homepage-banner-item {
-  flex: 0 0 100vw; /* match viewport exactly */
+  flex: 0 0 100%; /* match container width */
   scroll-snap-align: start;
   position: relative;
-  width: 100vw;
+  width: 100%;
   height: auto;
-  min-height: 400px; /* desktop default */
   box-sizing: border-box;
 }
 
 .homepage-banner-image {
-  width: 100vw; /* full width */
-  height: 100%; /* fill container height */
-  object-fit: cover; /* cover full area without gaps */
+  width: 100%;
+  height: auto;
+  object-fit: contain; /* no cropping */
   object-position: center;
   display: block;
-}
-
-/* Dots */
-.dot-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-  padding-bottom: 2px;
-  z-index: 2;
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: #bbb;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-}
-
-.dot.active {
-  background-color: #333;
-  transform: scale(1.4);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  background-color: #fdfdfd;
 }
 
 /* ===== Mobile Responsive ===== */
 @media screen and (max-width: 600px) {
   .homepage-banner-item {
-    height: auto; /* let image define height */
-    aspect-ratio: auto; /* let it scale naturally */
+    height: auto;
   }
 
   .homepage-banner-image {
     width: 100%;
-    height: auto;       /* maintain full image */
-    object-fit: contain; /* prevent cropping */
+    height: auto;
+    object-fit: contain;
   }
 }
 
-
-  .banner-section,
-  .homepage-banner-wrapper {
-    width: 100vw; /* always full width */
-    margin: 0;
-    padding: 0;
-    background-color: #fdfdfd; /* prevent black gaps */
-  }
-}
-
-/* ===== Fix zoom/overflow black gaps ===== */
+/* ===== Prevent horizontal scroll and black gaps ===== */
 html, body {
   width: 100%;
   overflow-x: hidden;
