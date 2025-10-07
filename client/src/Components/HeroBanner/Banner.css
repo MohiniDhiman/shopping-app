@@ -1,22 +1,24 @@
 /* ===== Banner Section ===== */
 .banner-section {
-  width: 100%;
+  width: 100vw; /* full viewport width */
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  background-color: #fdfdfd; /* consistent background to avoid black gaps */
+  background-color: #fdfdfd; /* consistent background */
   overflow: hidden;
 }
 
 .homepage-banner-wrapper {
-  width: 100%;
+  width: 100vw; /* full viewport width */
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  margin: 0; /* remove any default margin */
+  padding: 0; /* remove padding to avoid extra gaps */
 }
 
 .homepage-banner-wrapper::-webkit-scrollbar {
@@ -24,23 +26,24 @@
 }
 
 .homepage-banner-item {
-  flex: 0 0 100%;
+  flex: 0 0 100vw; /* match viewport exactly */
   scroll-snap-align: start;
   position: relative;
-  width: 100%;
+  width: 100vw;
   height: auto;
+  min-height: 400px; /* desktop default */
+  box-sizing: border-box;
 }
 
 .homepage-banner-image {
-  width: 100%;
-  height: auto; /* maintain original aspect ratio */
-  max-height: 400px; /* original desktop max height */
-  object-fit: cover;
+  width: 100vw; /* full width */
+  height: 100%; /* fill container height */
+  object-fit: cover; /* cover full area without gaps */
   object-position: center;
   display: block;
-  cursor: pointer;
 }
 
+/* Dots */
 .dot-container {
   display: flex;
   justify-content: center;
@@ -69,19 +72,30 @@
 /* ===== Mobile Responsive ===== */
 @media screen and (max-width: 768px) {
   .homepage-banner-item {
-    height: auto; /* adjust automatically */
-    min-height: 240px; /* keep reasonable size */
+    min-height: 240px; /* reasonable mobile height */
+    height: auto;
   }
 
   .homepage-banner-image {
-    max-height: none; /* allow full height as per image */
-    width: 100%;
-    height: auto;
+    width: 100vw;
+    height: 100%;
+    max-height: none;
   }
 
   .banner-section,
   .homepage-banner-wrapper {
-    width: 100vw; /* full viewport width */
-    background-color: #fdfdfd; /* consistent bg */
+    width: 100vw; /* always full width */
+    margin: 0;
+    padding: 0;
+    background-color: #fdfdfd; /* prevent black gaps */
   }
+}
+
+/* ===== Fix zoom/overflow black gaps ===== */
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  background-color: #fdfdfd;
 }

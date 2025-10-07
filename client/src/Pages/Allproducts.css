@@ -95,7 +95,7 @@ body {
 /* 1 column for mobile */
 @media (max-width: 576px) {
   .all-product-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .all-product-item {
